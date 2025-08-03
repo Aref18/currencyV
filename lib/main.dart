@@ -13,9 +13,17 @@ class CurrencyV extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         textTheme: TextTheme(
-          headlineLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          headlineLarge: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Colors.blueGrey,
+          ),
           bodyLarge: TextStyle(fontSize: 13, fontWeight: FontWeight.w300),
-          headlineMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+          bodyMedium: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+            color: Colors.white,
+          ),
         ),
       ),
       localizationsDelegates: [
@@ -50,13 +58,7 @@ class homepage extends StatelessWidget {
           ),
           SizedBox(width: 10),
 
-          Text(
-            'currencyV',
-            style: TextStyle(
-              fontSize: 13,
-              color: const Color.fromARGB(255, 112, 112, 112),
-            ),
-          ),
+          Text('CurrencyV', style: Theme.of(context).textTheme.headlineLarge),
           SizedBox(width: 10),
 
           Spacer(),
@@ -65,7 +67,7 @@ class homepage extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(25.0),
         child: Column(
           children: [
             Row(
@@ -75,7 +77,7 @@ class homepage extends StatelessWidget {
                 SizedBox(width: 10),
                 Text(
                   'نرم افزاری برای مشاهده نرخ ارز و کریپتوکارنسی',
-                  style: TextStyle(color: Colors.white, fontSize: 15),
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
             ),
