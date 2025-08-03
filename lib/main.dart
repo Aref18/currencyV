@@ -62,7 +62,6 @@ class homepage extends StatelessWidget {
           SizedBox(width: 10),
 
           Spacer(),
-
           Icon(Icons.menu),
         ],
       ),
