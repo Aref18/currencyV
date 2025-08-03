@@ -2,15 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
-  runApp(currencyV());
+  runApp(CurrencyV());
 }
 
-class currencyV extends StatelessWidget {
-  currencyV({super.key});
+class CurrencyV extends StatelessWidget {
+  CurrencyV({super.key});
   int count = 10;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        textTheme: TextTheme(
+          headlineLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          bodyLarge: TextStyle(fontSize: 13, fontWeight: FontWeight.w300),
+          headlineMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+        ),
+      ),
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -33,6 +40,7 @@ class homepage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 26, 27, 28),
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: const Color.fromARGB(113, 0, 0, 0),
         actions: [
           CircleAvatar(
@@ -45,7 +53,7 @@ class homepage extends StatelessWidget {
           Text(
             'currencyV',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 13,
               color: const Color.fromARGB(255, 112, 112, 112),
             ),
           ),
@@ -57,7 +65,7 @@ class homepage extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(32.0),
         child: Column(
           children: [
             Row(
