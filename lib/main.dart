@@ -48,7 +48,7 @@ class homepage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 26, 27, 28),
       appBar: AppBar(
-        elevation: 0,
+        elevation: 1,
         backgroundColor: const Color.fromARGB(113, 0, 0, 0),
         actions: [
           CircleAvatar(
