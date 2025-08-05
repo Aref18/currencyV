@@ -14,9 +14,9 @@ class CurrencyV extends StatelessWidget {
       theme: ThemeData(
         textTheme: TextTheme(
           headlineLarge: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.blueGrey,
+            color: Colors.white,
           ),
           bodyLarge: TextStyle(fontSize: 13, fontWeight: FontWeight.w300),
           bodyMedium: TextStyle(
@@ -79,6 +79,34 @@ class homepage extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
+            ),
+            SizedBox(height: 30),
+            Container(
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(146, 224, 109, 101),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'نام',
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
+                    Text(
+                      'قیمت',
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
+                    Text(
+                      'تغییرات',
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
