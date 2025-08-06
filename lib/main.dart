@@ -16,11 +16,11 @@ class CurrencyV extends StatelessWidget {
           headlineLarge: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: const Color.fromARGB(255, 255, 255, 255),
           ),
           bodyLarge: TextStyle(fontSize: 13, fontWeight: FontWeight.w300),
           bodyMedium: TextStyle(
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: FontWeight.w300,
             color: Colors.white,
           ),
@@ -51,18 +51,18 @@ class homepage extends StatelessWidget {
         elevation: 0,
         backgroundColor: const Color.fromARGB(113, 0, 0, 0),
         actions: [
+          SizedBox(width: 10),
           CircleAvatar(
             backgroundColor: const Color.fromARGB(255, 169, 124, 108),
             backgroundImage: AssetImage('assets/images/V.png'),
             radius: 20,
           ),
           SizedBox(width: 10),
-
           Text('CurrencyV', style: Theme.of(context).textTheme.headlineLarge),
-          SizedBox(width: 10),
 
           Spacer(),
           Icon(Icons.menu),
+          SizedBox(width: 10),
         ],
       ),
       body: Padding(
@@ -82,30 +82,55 @@ class homepage extends StatelessWidget {
             ),
             SizedBox(height: 30),
             Container(
-              height: 40,
+              width: double.infinity,
+              height: 35,
               decoration: BoxDecoration(
                 color: const Color.fromARGB(146, 224, 109, 101),
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'نام',
-                      style: Theme.of(context).textTheme.headlineLarge,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text('نام', style: Theme.of(context).textTheme.headlineLarge),
+                  Text(
+                    'قیمت',
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  ),
+                  Text(
+                    'تغییرات',
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 15),
+            SizedBox(
+              width: double.infinity,
+              height: 350,
+              child: ListView.builder(
+                physics: BouncingScrollPhysics(),
+                itemCount: 10,
+                itemBuilder: (BuildContext context, int positsion) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(blurRadius: 1.0, color: Colors.grey),
+                        ],
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+
+                      width: double.infinity,
+                      height: 50,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [Text('دلار'), Text('93700'), Text('+43')],
+                      ),
                     ),
-                    Text(
-                      'قیمت',
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
-                    Text(
-                      'تغییرات',
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ],
