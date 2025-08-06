@@ -115,7 +115,7 @@ class homepage extends StatelessWidget {
                 height: 500,
                 child: ListView.builder(
                   physics: BouncingScrollPhysics(),
-                  itemCount: 5,
+                  itemCount: 9,
                   itemBuilder: (BuildContext context, int index) {
                     return Items();
                   },
@@ -131,16 +131,20 @@ class homepage extends StatelessWidget {
                     color: const Color.fromARGB(146, 224, 109, 101),
                   ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                     children: [
                       SizedBox(
                         height: double.infinity,
                         child: TextButton.icon(
                           style: ButtonStyle(
                             backgroundColor: WidgetStateProperty.all(
-                              Colors.blueGrey,
+                              Colors.purple,
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            _showSnakeBar(context, '${_getTime()}');
+                          },
                           label: Text(
                             'بروزرسانی',
                             style: Theme.of(context).textTheme.headlineLarge,
@@ -152,6 +156,9 @@ class homepage extends StatelessWidget {
                           ),
                         ),
                       ),
+
+                      Text('اخرین بروز رسانی  ${_getTime()}'),
+                      SizedBox(),
                     ],
                   ),
                 ),
@@ -162,6 +169,16 @@ class homepage extends StatelessWidget {
       ),
     );
   }
+}
+
+String _getTime() {
+  return '23:45';
+}
+
+void _showSnakeBar(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(message), backgroundColor: Colors.green),
+  );
 }
 
 //----------------------------------------------------
