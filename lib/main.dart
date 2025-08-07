@@ -60,7 +60,7 @@ class homepage extends StatelessWidget {
             radius: 20,
           ),
           SizedBox(width: 10),
-          Text('CurrencyV', style: Theme.of(context).textTheme.headlineLarge),
+          Text('ArzV', style: Theme.of(context).textTheme.headlineLarge),
 
           Spacer(),
           Icon(Icons.menu),
@@ -203,7 +203,11 @@ class Items extends StatelessWidget {
         height: 55,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [Text('دلار'), Text('93700'), Text('+43')],
+          children: [
+            Text('دلار', style: Theme.of(context).textTheme.headlineLarge),
+            Text('93700', style: Theme.of(context).textTheme.headlineLarge),
+            Text('+ 43', style: Theme.of(context).textTheme.headlineLarge),
+          ],
         ),
       ),
     );
