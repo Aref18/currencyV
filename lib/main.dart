@@ -1,6 +1,9 @@
+import 'package:currencyv/model/arz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
 void main() {
   runApp(CurrencyV());
@@ -8,7 +11,7 @@ void main() {
 
 class CurrencyV extends StatelessWidget {
   CurrencyV({super.key});
-  int count = 10;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -42,11 +45,45 @@ class CurrencyV extends StatelessWidget {
 }
 
 //----------------------------------------------------
-class homepage extends StatelessWidget {
+
+class homepage extends StatefulWidget {
   const homepage({super.key});
 
   @override
+  State<homepage> createState() => _homepageState();
+}
+
+class _homepageState extends State<homepage> {
+  List<Arzcurrency> arz = [];
+  GetResponse(BuildContext cntx) {
+    var Url =
+        "https://sasansafari.com/flutter/api.php?access_key=flutter123456";
+
+    http.get(Uri.parse(Url)).then((value) {
+      if (value.statusCode == 200) {
+        List jsonList = convert.jsonDecode(value.body);
+        if (jsonList.length > 0) {
+          for (var i = 0; i < jsonList.length; i++) {
+            setState(() {
+              arz.add(
+                Arzcurrency(
+                  id: jsonList[i]["id"],
+                  title: jsonList[i]["title"],
+                  price: jsonList[i]["price"],
+                  changes: jsonList[i]["changes"],
+                  status: jsonList[i]["status"],
+                ),
+              );
+            });
+          }
+        }
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    GetResponse(context);
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 26, 27, 28),
       appBar: AppBar(
@@ -55,7 +92,7 @@ class homepage extends StatelessWidget {
         actions: [
           SizedBox(width: 10),
           CircleAvatar(
-            backgroundColor: const Color.fromARGB(255, 169, 124, 108),
+            backgroundColor: Colors.white,
             backgroundImage: AssetImage('assets/images/V.png'),
             radius: 20,
           ),
@@ -115,9 +152,9 @@ class homepage extends StatelessWidget {
                 height: 500,
                 child: ListView.builder(
                   physics: BouncingScrollPhysics(),
-                  itemCount: 9,
+                  itemCount: arz.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return Items();
+                    return Items(index, arz);
                   },
                 ),
               ),
@@ -184,7 +221,9 @@ void _showSnakeBar(BuildContext context, String message) {
 //----------------------------------------------------
 
 class Items extends StatelessWidget {
-  const Items({super.key});
+  int index;
+  List<Arzcurrency> arz;
+  Items(this.index, this.arz, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -204,9 +243,18 @@ class Items extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text('دلار', style: Theme.of(context).textTheme.headlineLarge),
-            Text('93700', style: Theme.of(context).textTheme.headlineLarge),
-            Text('+ 43', style: Theme.of(context).textTheme.headlineLarge),
+            Text(
+              arz[index].title!,
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            Text(
+              arz[index].price!,
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            Text(
+              arz[index].changes!,
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
           ],
         ),
       ),
