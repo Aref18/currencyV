@@ -60,21 +60,23 @@ class _homepageState extends State<homepage> {
         "https://sasansafari.com/flutter/api.php?access_key=flutter123456";
 
     http.get(Uri.parse(Url)).then((value) {
-      if (value.statusCode == 200) {
-        List jsonList = convert.jsonDecode(value.body);
-        if (jsonList.length > 0) {
-          for (var i = 0; i < jsonList.length; i++) {
-            setState(() {
-              arz.add(
-                Arzcurrency(
-                  id: jsonList[i]["id"],
-                  title: jsonList[i]["title"],
-                  price: jsonList[i]["price"],
-                  changes: jsonList[i]["changes"],
-                  status: jsonList[i]["status"],
-                ),
-              );
-            });
+      if (arz.isEmpty) {
+        if (value.statusCode == 200) {
+          List jsonList = convert.jsonDecode(value.body);
+          if (jsonList.length > 0) {
+            for (var i = 0; i < jsonList.length; i++) {
+              setState(() {
+                arz.add(
+                  Arzcurrency(
+                    id: jsonList[i]["id"],
+                    title: jsonList[i]["title"],
+                    price: jsonList[i]["price"],
+                    changes: jsonList[i]["changes"],
+                    status: jsonList[i]["status"],
+                  ),
+                );
+              });
+            }
           }
         }
       }
