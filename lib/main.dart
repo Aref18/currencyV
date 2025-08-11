@@ -20,11 +20,16 @@ class CurrencyV extends StatelessWidget {
           headlineLarge: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: const Color.fromARGB(255, 255, 255, 255),
+            color: Colors.green,
           ),
-          bodyLarge: TextStyle(fontSize: 13, fontWeight: FontWeight.w300),
-          bodyMedium: TextStyle(
+          headlineSmall: TextStyle(fontSize: 18, color: Colors.red),
+          bodyLarge: TextStyle(
             fontSize: 15,
+            fontWeight: FontWeight.w300,
+            color: Colors.white,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 18,
             fontWeight: FontWeight.w300,
             color: Colors.white,
           ),
@@ -99,7 +104,7 @@ class _homepageState extends State<homepage> {
             radius: 20,
           ),
           SizedBox(width: 10),
-          Text('ArzV', style: Theme.of(context).textTheme.headlineLarge),
+          Text('ArzV', style: Theme.of(context).textTheme.bodyLarge),
 
           Spacer(),
           Icon(Icons.menu),
@@ -118,7 +123,7 @@ class _homepageState extends State<homepage> {
                   SizedBox(width: 10),
                   Text(
                     'نرم افزاری برای مشاهده نرخ ارز و کریپتوکارنسی',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],
               ),
@@ -133,17 +138,11 @@ class _homepageState extends State<homepage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text(
-                      'نام',
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
-                    Text(
-                      'قیمت',
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
+                    Text('نام', style: Theme.of(context).textTheme.bodyLarge),
+                    Text('قیمت', style: Theme.of(context).textTheme.bodyLarge),
                     Text(
                       'تغییرات',
-                      style: Theme.of(context).textTheme.headlineLarge,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                 ),
@@ -186,7 +185,7 @@ class _homepageState extends State<homepage> {
                           },
                           label: Text(
                             'بروزرسانی',
-                            style: Theme.of(context).textTheme.headlineLarge,
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           icon: Icon(
                             CupertinoIcons.refresh,
@@ -247,15 +246,18 @@ class Items extends StatelessWidget {
           children: [
             Text(
               arz[index].title!,
-              style: Theme.of(context).textTheme.headlineLarge,
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             Text(
               arz[index].price!,
-              style: Theme.of(context).textTheme.headlineLarge,
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             Text(
               arz[index].changes!,
-              style: Theme.of(context).textTheme.headlineLarge,
+              style:
+                  arz[index].status == "n"
+                      ? Theme.of(context).textTheme.headlineSmall
+                      : Theme.of(context).textTheme.headlineLarge,
             ),
           ],
         ),
