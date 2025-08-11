@@ -1,5 +1,4 @@
 import 'package:currencyv/model/arz.dart';
-import 'package:currencyv/searching.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -61,7 +60,8 @@ class homepage extends StatefulWidget {
 
 class _homepageState extends State<homepage> {
   List<Arzcurrency> arz = [];
-  GetResponse(BuildContext cntx) {
+  List<Arzcurrency> filteredItems = [];
+  GetResponse() {
     var Url =
         "https://sasansafari.com/flutter/api.php?access_key=flutter123456";
 
@@ -89,9 +89,28 @@ class _homepageState extends State<homepage> {
     });
   }
 
+  TextEditingController searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    filteredItems = [];
+  }
+
+  void filterSearch() {
+    final query = searchController.text;
+    final results = arz.where(
+      (item) => item.title!.toLowerCase().contains(query.toLowerCase()),
+    );
+
+    setState(() {
+      filteredItems = results.toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    GetResponse(context);
+    GetResponse();
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 26, 27, 28),
       appBar: AppBar(
@@ -99,11 +118,10 @@ class _homepageState extends State<homepage> {
         backgroundColor: const Color.fromARGB(113, 0, 0, 0),
         actions: [
           SizedBox(width: 10),
-          IconButton(
-            onPressed: () {
-              showSearch(context: context, delegate: CustomSearchDelegate(arz));
-            },
-            icon: Icon(Icons.search, color: Colors.white),
+          CircleAvatar(
+            backgroundColor: Colors.white,
+            backgroundImage: AssetImage('assets/images/V.png'),
+            radius: 20,
           ),
           SizedBox(width: 10),
           Text('ArzV', style: Theme.of(context).textTheme.bodyLarge),
@@ -118,20 +136,34 @@ class _homepageState extends State<homepage> {
           padding: const EdgeInsets.all(25.0),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [SizedBox(width: 10)],
+              TextField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 83, 82, 82),
+                  hintText: 'جستجو... ',
+                  hintStyle: Theme.of(context).textTheme.bodyLarge,
+                  prefixIcon: Icon(Icons.search, color: Colors.white),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+                onSubmitted: (value) => filterSearch(), // وقتی Enter بزنه
               ),
-
               SizedBox(height: 15),
               SizedBox(
                 width: double.infinity,
                 height: 500,
                 child: ListView.builder(
                   physics: BouncingScrollPhysics(),
-                  itemCount: arz.length,
+                  itemCount:
+                      filteredItems.isEmpty ? arz.length : filteredItems.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return Items(index, arz);
+                    return Items(
+                      index,
+                      filteredItems.isEmpty ? arz : filteredItems,
+                    );
                   },
                 ),
               ),
