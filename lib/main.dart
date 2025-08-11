@@ -1,4 +1,5 @@
 import 'package:currencyv/model/arz.dart';
+import 'package:currencyv/searching.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -24,7 +25,7 @@ class CurrencyV extends StatelessWidget {
           ),
           headlineSmall: TextStyle(fontSize: 18, color: Colors.red),
           bodyLarge: TextStyle(
-            fontSize: 15,
+            fontSize: 17,
             fontWeight: FontWeight.w300,
             color: Colors.white,
           ),
@@ -98,10 +99,11 @@ class _homepageState extends State<homepage> {
         backgroundColor: const Color.fromARGB(113, 0, 0, 0),
         actions: [
           SizedBox(width: 10),
-          CircleAvatar(
-            backgroundColor: Colors.white,
-            backgroundImage: AssetImage('assets/images/V.png'),
-            radius: 20,
+          IconButton(
+            onPressed: () {
+              showSearch(context: context, delegate: CustomSearchDelegate(arz));
+            },
+            icon: Icon(Icons.search, color: Colors.white),
           ),
           SizedBox(width: 10),
           Text('ArzV', style: Theme.of(context).textTheme.bodyLarge),
@@ -118,35 +120,9 @@ class _homepageState extends State<homepage> {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(Icons.currency_exchange, color: Colors.white),
-                  SizedBox(width: 10),
-                  Text(
-                    'نرم افزاری برای مشاهده نرخ ارز و کریپتوکارنسی',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
+                children: [SizedBox(width: 10)],
               ),
-              SizedBox(height: 30),
-              Container(
-                width: double.infinity,
-                height: 35,
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(146, 224, 109, 101),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text('نام', style: Theme.of(context).textTheme.bodyLarge),
-                    Text('قیمت', style: Theme.of(context).textTheme.bodyLarge),
-                    Text(
-                      'تغییرات',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
-              ),
+
               SizedBox(height: 15),
               SizedBox(
                 width: double.infinity,
