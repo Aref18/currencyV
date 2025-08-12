@@ -69,6 +69,7 @@ class _homepageState extends State<homepage> {
       if (arz.isEmpty) {
         if (value.statusCode == 200) {
           List jsonList = convert.jsonDecode(value.body);
+          // ignore: prefer_is_empty
           if (jsonList.length > 0) {
             for (var i = 0; i < jsonList.length; i++) {
               setState(() {
@@ -97,14 +98,16 @@ class _homepageState extends State<homepage> {
     filteredItems = [];
   }
 
-  void filterSearch() {
-    final query = searchController.text;
-    final results = arz.where(
-      (item) => item.title!.toLowerCase().contains(query.toLowerCase()),
-    );
+  void filterSearch(String query) {
+    final results =
+        arz
+            .where(
+              (item) => item.title!.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList();
 
     setState(() {
-      filteredItems = results.toList();
+      filteredItems = results;
     });
   }
 
@@ -139,7 +142,7 @@ class _homepageState extends State<homepage> {
               TextField(
                 controller: searchController,
                 decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
                   filled: true,
                   fillColor: const Color.fromARGB(255, 83, 82, 82),
                   hintText: 'جستجو... ',
@@ -149,7 +152,7 @@ class _homepageState extends State<homepage> {
                     borderRadius: BorderRadius.circular(25),
                   ),
                 ),
-                onSubmitted: (value) => filterSearch(), // وقتی Enter بزنه
+                onChanged: filterSearch,
               ),
               SizedBox(height: 15),
               SizedBox(
@@ -168,7 +171,7 @@ class _homepageState extends State<homepage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                 child: Container(
                   width: double.infinity,
                   height: 55,
@@ -237,7 +240,7 @@ class Items extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+      padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
       child: Container(
         decoration: BoxDecoration(
           boxShadow: <BoxShadow>[
