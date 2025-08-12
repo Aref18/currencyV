@@ -51,6 +51,7 @@ class CurrencyV extends StatelessWidget {
 
 //----------------------------------------------------
 
+// ignore: camel_case_types
 class homepage extends StatefulWidget {
   const homepage({super.key});
 
@@ -58,9 +59,11 @@ class homepage extends StatefulWidget {
   State<homepage> createState() => _homepageState();
 }
 
+// ignore: camel_case_types
 class _homepageState extends State<homepage> {
+  //connecty to Api
   List<Arzcurrency> arz = [];
-  List<Arzcurrency> filteredItems = [];
+
   GetResponse() {
     var Url =
         "https://sasansafari.com/flutter/api.php?access_key=flutter123456";
@@ -90,6 +93,10 @@ class _homepageState extends State<homepage> {
     });
   }
 
+  //--------------------searching part
+
+  List<Arzcurrency> filteredItems = [];
+
   TextEditingController searchController = TextEditingController();
 
   @override
@@ -109,6 +116,28 @@ class _homepageState extends State<homepage> {
     setState(() {
       filteredItems = results;
     });
+  }
+
+  // ---------- متدهای کمکی برای ریسپانسیو----------
+
+  int _getCrossAxisCount(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    if (width < 600) {
+      return 2; // موبایل
+    } else if (width < 900) {
+      return 3; // تبلت عمودی
+    } else {
+      return 4; // تبلت افقی یا دسکتاپ
+    }
+  }
+
+  double _getAspectRatio(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    if (width < 600) {
+      return 1; // موبایل: کارت تقریبا مربعی
+    } else {
+      return 1.5; // تبلت و دسکتاپ: کارت پهن‌تر
+    }
   }
 
   @override
@@ -158,7 +187,8 @@ class _homepageState extends State<homepage> {
               SizedBox(
                 width: double.infinity,
                 height: 500,
-                child: ListView.builder(
+                child: GridView.builder(
+                  shrinkWrap: true,
                   physics: BouncingScrollPhysics(),
                   itemCount:
                       filteredItems.isEmpty ? arz.length : filteredItems.length,
@@ -168,6 +198,16 @@ class _homepageState extends State<homepage> {
                       filteredItems.isEmpty ? arz : filteredItems,
                     );
                   },
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: _getCrossAxisCount(
+                      context,
+                    ), // تعداد ستون‌ها ریسپانسیو
+                    childAspectRatio: _getAspectRatio(
+                      context,
+                    ), // نسبت عرض به ارتفاع ریسپانسیو
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
                 ),
               ),
               Padding(
@@ -192,7 +232,7 @@ class _homepageState extends State<homepage> {
                             ),
                           ),
                           onPressed: () {
-                            _showSnakeBar(context, '${_getTime()}');
+                            _showSnakeBar(context, _getTime());
                           },
                           label: Text(
                             'بروزرسانی',
@@ -240,11 +280,11 @@ class Items extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: Container(
         decoration: BoxDecoration(
           boxShadow: <BoxShadow>[
-            BoxShadow(blurRadius: 1.0, color: Colors.grey),
+            BoxShadow(blurRadius: 1.0, color: Colors.purple),
           ],
           color: Colors.black,
           borderRadius: BorderRadius.circular(15),
@@ -252,23 +292,45 @@ class Items extends StatelessWidget {
 
         width: double.infinity,
         height: 55,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+        child: Column(
+          spacing: 50,
           children: [
-            Text(
-              arz[index].title!,
-              style: Theme.of(context).textTheme.bodyLarge,
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Text(
+                arz[index].title!,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
             ),
-            Text(
-              arz[index].price!,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            Text(
-              arz[index].changes!,
-              style:
-                  arz[index].status == "n"
-                      ? Theme.of(context).textTheme.headlineSmall
-                      : Theme.of(context).textTheme.headlineLarge,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  arz[index].price!,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                SizedBox(width: 8),
+                Row(
+                  children: [
+                    Text(
+                      arz[index].changes!,
+                      style:
+                          arz[index].status == "n"
+                              ? Theme.of(context).textTheme.headlineSmall
+                              : Theme.of(context).textTheme.headlineLarge,
+                    ),
+                    SizedBox(width: 4),
+                    Icon(
+                      arz[index].status == "n"
+                          ? Icons.arrow_downward
+                          : Icons.arrow_upward,
+                      color:
+                          arz[index].status == "n" ? Colors.red : Colors.green,
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
