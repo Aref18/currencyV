@@ -274,7 +274,7 @@ class Items extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
-
+                  SizedBox(width: 10),
                   Text(
                     arz[index].title!,
                     style: Theme.of(context).textTheme.bodyLarge,
