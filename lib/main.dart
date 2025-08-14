@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:currencyv/model/arz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -127,7 +129,7 @@ class _homepageState extends State<homepage> {
     } else if (width < 900) {
       return 3; // تبلت عمودی
     } else {
-      return 4; // تبلت افقی یا دسکتاپ
+      return 3; // تبلت افقی یا دسکتاپ
     }
   }
 
@@ -140,6 +142,7 @@ class _homepageState extends State<homepage> {
     }
   }
 
+  bool showResultss = false;
   @override
   Widget build(BuildContext context) {
     GetResponse();
@@ -163,98 +166,62 @@ class _homepageState extends State<homepage> {
           SizedBox(width: 10),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(25.0),
-          child: Column(
-            children: [
-              TextField(
-                controller: searchController,
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
-                  filled: true,
-                  fillColor: const Color.fromARGB(255, 83, 82, 82),
-                  hintText: 'جستجو... ',
-                  hintStyle: Theme.of(context).textTheme.bodyLarge,
-                  prefixIcon: Icon(Icons.search, color: Colors.white),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                onChanged: filterSearch,
-              ),
-              SizedBox(height: 15),
-              SizedBox(
-                width: double.infinity,
-                height: 500,
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: BouncingScrollPhysics(),
-                  itemCount:
-                      filteredItems.isEmpty ? arz.length : filteredItems.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Items(
-                      index,
-                      filteredItems.isEmpty ? arz : filteredItems,
-                    );
-                  },
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: _getCrossAxisCount(
-                      context,
-                    ), // تعداد ستون‌ها ریسپانسیو
-                    childAspectRatio: _getAspectRatio(
-                      context,
-                    ), // نسبت عرض به ارتفاع ریسپانسیو
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                child: Container(
-                  width: double.infinity,
-                  height: 55,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(1000),
-                    color: const Color.fromARGB(146, 224, 109, 101),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                    children: [
-                      SizedBox(
-                        height: double.infinity,
-                        child: TextButton.icon(
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(
-                              Colors.purple,
-                            ),
-                          ),
-                          onPressed: () {
-                            _showSnakeBar(context, _getTime());
-                          },
-                          label: Text(
-                            'بروزرسانی',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          icon: Icon(
-                            CupertinoIcons.refresh,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                        ),
+      body: Stack(
+        children: [
+          // پس زمینه: اینجا GridView رو مستقیم میذاریم تا پشت Blur باشه
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                children: [
+                  SizedBox(height: 60), // جای سرچ بار
+                  Expanded(
+                    child: GridView.builder(
+                      physics: BouncingScrollPhysics(),
+                      itemCount:
+                          filteredItems.isEmpty
+                              ? arz.length
+                              : filteredItems.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Items(
+                          index,
+                          filteredItems.isEmpty ? arz : filteredItems,
+                        );
+                      },
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: _getCrossAxisCount(context),
+                        childAspectRatio: _getAspectRatio(context),
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
                       ),
-
-                      Text('اخرین بروز رسانی  ${_getTime()}'),
-                      SizedBox(),
-                    ],
+                    ),
                   ),
+                ],
+              ),
+            ),
+          ),
+
+          // سرچ بار بالا
+          Positioned(
+            top: 20,
+            left: 25,
+            right: 25,
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color.fromARGB(255, 83, 82, 82),
+                hintText: 'جستجو... ',
+                hintStyle: TextStyle(color: Colors.white),
+                prefixIcon: Icon(Icons.search, color: Colors.white),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
                 ),
               ),
-            ],
+              onChanged: filterSearch,
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -297,10 +264,22 @@ class Items extends StatelessWidget {
           spacing: 50,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Text(
-                arz[index].title!,
-                style: Theme.of(context).textTheme.bodyLarge,
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    child: Image.network(
+                      "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                  Text(
+                    arz[index].title!,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ],
               ),
             ),
             Row(
