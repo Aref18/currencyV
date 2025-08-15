@@ -1,11 +1,12 @@
 import 'dart:ui';
 
 import 'package:currencyv/model/arz.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+
+import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 
 void main() {
   runApp(CurrencyV());
@@ -27,12 +28,12 @@ class CurrencyV extends StatelessWidget {
           headlineSmall: TextStyle(fontSize: 18, color: Colors.red),
           bodyLarge: TextStyle(
             fontSize: 17,
-            fontWeight: FontWeight.w300,
+            fontWeight: FontWeight.w500,
             color: Colors.white,
           ),
           bodyMedium: TextStyle(
             fontSize: 18,
-            fontWeight: FontWeight.w300,
+            fontWeight: FontWeight.w500,
             color: Colors.white,
           ),
         ),
@@ -98,27 +99,6 @@ class _homepageState extends State<homepage> {
   //--------------------searching part
 
   List<Arzcurrency> filteredItems = [];
-
-  TextEditingController searchController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    filteredItems = [];
-  }
-
-  void filterSearch(String query) {
-    final results =
-        arz
-            .where(
-              (item) => item.title!.toLowerCase().contains(query.toLowerCase()),
-            )
-            .toList();
-
-    setState(() {
-      filteredItems = results;
-    });
-  }
 
   // ---------- متدهای کمکی برای ریسپانسیو----------
 
@@ -201,28 +181,69 @@ class _homepageState extends State<homepage> {
             ),
           ),
 
-          // سرچ بار بالا
-          Positioned(
-            top: 20,
-            left: 25,
-            right: 25,
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color.fromARGB(255, 83, 82, 82),
-                hintText: 'جستجو... ',
-                hintStyle: TextStyle(color: Colors.white),
-                prefixIcon: Icon(Icons.search, color: Colors.white),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25),
-                ),
-              ),
-              onChanged: filterSearch,
-            ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: buildFloatingSearchBar(),
           ),
         ],
       ),
+    );
+  }
+
+  Widget buildFloatingSearchBar() {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    return FloatingSearchBar(
+      hint: 'جستجوی رمز ارز...',
+      scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+      transitionDuration: const Duration(milliseconds: 600),
+      transitionCurve: Curves.easeInOut,
+      physics: const BouncingScrollPhysics(),
+      width: isPortrait ? 600 : 500,
+      axisAlignment: isPortrait ? 0.0 : -1.0,
+      openAxisAlignment: 0.0,
+      debounceDelay: const Duration(milliseconds: 300),
+      onQueryChanged: (query) {
+        // فیلتر کردن لیست
+        setState(() {
+          filteredItems =
+              arz
+                  .where(
+                    (item) =>
+                        item.title!.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList();
+        });
+      },
+      transition: CircularFloatingSearchBarTransition(),
+      actions: [FloatingSearchBarAction.searchToClear()],
+      builder: (context, transition) {
+        final displayList = filteredItems.isEmpty ? arz : filteredItems;
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Material(
+            color: Colors.white,
+            elevation: 4.0,
+            child: SizedBox(
+              height: 500,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: displayList.length,
+                itemBuilder: (context, index) {
+                  final item = displayList[index];
+                  return ListTile(
+                    title: Text(item.title ?? ''),
+                    onTap: () {
+                      // میتونی اینجا اکشن بزاری
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -264,7 +285,7 @@ class Items extends StatelessWidget {
           spacing: 50,
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(15.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
