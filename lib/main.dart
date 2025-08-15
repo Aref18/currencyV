@@ -122,7 +122,17 @@ class _homepageState extends State<homepage> {
     }
   }
 
-  bool showResultss = false;
+  bool showResults = false;
+  Arzcurrency? selectedItem;
+  @override
+  void initState() {
+    super.initState();
+    // میتونی با استفاده از Future.delayed سرچ بار رو باز کنی
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FloatingSearchBar.of(context)?.open();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     GetResponse();
@@ -158,14 +168,11 @@ class _homepageState extends State<homepage> {
                   Expanded(
                     child: GridView.builder(
                       physics: BouncingScrollPhysics(),
-                      itemCount:
-                          filteredItems.isEmpty
-                              ? arz.length
-                              : filteredItems.length,
+                      itemCount: showResults ? 1 : arz.length,
                       itemBuilder: (BuildContext context, int index) {
                         return Items(
                           index,
-                          filteredItems.isEmpty ? arz : filteredItems,
+                          showResults ? [selectedItem!] : arz,
                         );
                       },
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -190,11 +197,16 @@ class _homepageState extends State<homepage> {
     );
   }
 
+  TextEditingController searchController = TextEditingController();
+
+  String currentQuery = '';
+
   Widget buildFloatingSearchBar() {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.landscape;
     return FloatingSearchBar(
       hint: 'جستجوی رمز ارز...',
+      queryStyle: TextStyle(color: Colors.black),
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 600),
       transitionCurve: Curves.easeInOut,
@@ -204,8 +216,8 @@ class _homepageState extends State<homepage> {
       openAxisAlignment: 0.0,
       debounceDelay: const Duration(milliseconds: 300),
       onQueryChanged: (query) {
-        // فیلتر کردن لیست
         setState(() {
+          currentQuery = query;
           filteredItems =
               arz
                   .where(
@@ -215,9 +227,13 @@ class _homepageState extends State<homepage> {
                   .toList();
         });
       },
+
       transition: CircularFloatingSearchBarTransition(),
       actions: [FloatingSearchBarAction.searchToClear()],
       builder: (context, transition) {
+        if (currentQuery.isEmpty)
+          return SizedBox.shrink(); // وقتی متن خالیه، چیزی نمایش نده
+
         final displayList = filteredItems.isEmpty ? arz : filteredItems;
 
         return ClipRRect(
@@ -225,21 +241,20 @@ class _homepageState extends State<homepage> {
           child: Material(
             color: Colors.white,
             elevation: 4.0,
-            child: SizedBox(
-              height: 500,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: displayList.length,
-                itemBuilder: (context, index) {
-                  final item = displayList[index];
-                  return ListTile(
-                    title: Text(item.title ?? ''),
-                    onTap: () {
-                      // میتونی اینجا اکشن بزاری
-                    },
-                  );
-                },
-              ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: displayList.length,
+              itemBuilder: (context, index) {
+                final item = displayList[index];
+                return ListTile(
+                  title: Text(item.title ?? ''),
+                  onTap: () {
+                    searchController.text = item.title ?? '';
+                    filteredItems = [];
+                    FloatingSearchBar.of(context)?.close();
+                  },
+                );
+              },
             ),
           ),
         );
