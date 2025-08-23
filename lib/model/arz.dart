@@ -12,4 +12,10 @@ class Arzcurrency {
     required this.changes,
     required this.status,
   });
+
+  contains(Arzcurrency item) {}
+
+  void remove(Arzcurrency item) {}
+
+  void add(Arzcurrency item) {}
 }

@@ -1,11 +1,9 @@
 import 'dart:ui';
-
 import 'package:currencyv/model/arz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 
 void main() {
@@ -43,91 +41,87 @@ class CurrencyV extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [
-        Locale('fa'), // Spanish
-      ],
+      supportedLocales: [Locale('fa')],
       debugShowCheckedModeBanner: false,
       home: homepage(),
     );
   }
 }
 
-//----------------------------------------------------
+class ItemModel {
+  final String? title;
+  ItemModel({this.title});
+}
 
-// ignore: camel_case_types
 class homepage extends StatefulWidget {
-  const homepage({super.key});
+  homepage({super.key});
+  List<ItemModel> allItems = List.generate(
+    20,
+    (index) => ItemModel(title: "آیتم شماره $index"),
+  );
+
+  List<Arzcurrency> selectedItem = [];
 
   @override
   State<homepage> createState() => _homepageState();
 }
 
-// ignore: camel_case_types
 class _homepageState extends State<homepage> {
-  //connecty to Api
   List<Arzcurrency> arz = [];
 
-  GetResponse() {
+  Future GetResponse(BuildContext cntx) async {
     var Url =
         "https://sasansafari.com/flutter/api.php?access_key=flutter123456";
-
-    http.get(Uri.parse(Url)).then((value) {
-      if (arz.isEmpty) {
-        if (value.statusCode == 200) {
-          List jsonList = convert.jsonDecode(value.body);
-          // ignore: prefer_is_empty
-          if (jsonList.length > 0) {
-            for (var i = 0; i < jsonList.length; i++) {
-              setState(() {
-                arz.add(
-                  Arzcurrency(
-                    id: jsonList[i]["id"],
-                    title: jsonList[i]["title"],
-                    price: jsonList[i]["price"],
-                    changes: jsonList[i]["changes"],
-                    status: jsonList[i]["status"],
-                  ),
-                );
-              });
-            }
+    var value = await http.get(Uri.parse(Url));
+    if (arz.isEmpty) {
+      if (value.statusCode == 200) {
+        List jsonList = convert.jsonDecode(value.body);
+        if (jsonList.isNotEmpty) {
+          for (var i = 0; i < jsonList.length; i++) {
+            setState(() {
+              arz.add(
+                Arzcurrency(
+                  id: jsonList[i]["id"],
+                  title: jsonList[i]["title"],
+                  price: jsonList[i]["price"],
+                  changes: jsonList[i]["changes"],
+                  status: jsonList[i]["status"],
+                ),
+              );
+            });
           }
         }
       }
-    });
+    }
   }
 
-  //--------------------searching part
-
   List<Arzcurrency> filteredItems = [];
-
-  // ---------- متدهای کمکی برای ریسپانسیو----------
+  bool showResults = false;
 
   int _getCrossAxisCount(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     if (width < 600) {
-      return 2; // موبایل
+      return 2;
     } else if (width < 900) {
-      return 3; // تبلت عمودی
+      return 3;
     } else {
-      return 3; // تبلت افقی یا دسکتاپ
+      return 3;
     }
   }
 
   double _getAspectRatio(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     if (width < 600) {
-      return 1; // موبایل: کارت تقریبا مربعی
+      return 1;
     } else {
-      return 1.5; // تبلت و دسکتاپ: کارت پهن‌تر
+      return 1.5;
     }
   }
 
-  bool showResults = false;
-  Arzcurrency? selectedItem;
   @override
   void initState() {
+    GetResponse(context);
     super.initState();
-    // میتونی با استفاده از Future.delayed سرچ بار رو باز کنی
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FloatingSearchBar.of(context)?.open();
     });
@@ -135,7 +129,6 @@ class _homepageState extends State<homepage> {
 
   @override
   Widget build(BuildContext context) {
-    GetResponse();
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 26, 27, 28),
       appBar: AppBar(
@@ -150,7 +143,6 @@ class _homepageState extends State<homepage> {
           ),
           SizedBox(width: 10),
           Text('ArzV', style: Theme.of(context).textTheme.bodyLarge),
-
           Spacer(),
           Icon(Icons.menu),
           SizedBox(width: 10),
@@ -158,21 +150,32 @@ class _homepageState extends State<homepage> {
       ),
       body: Stack(
         children: [
-          // پس زمینه: اینجا GridView رو مستقیم میذاریم تا پشت Blur باشه
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(25.0),
               child: Column(
                 children: [
-                  SizedBox(height: 60), // جای سرچ بار
+                  SizedBox(height: 60),
                   Expanded(
                     child: GridView.builder(
                       physics: BouncingScrollPhysics(),
-                      itemCount: showResults ? 1 : arz.length,
+                      itemCount:
+                          showResults ? widget.selectedItem.length : arz.length,
                       itemBuilder: (BuildContext context, int index) {
                         return Items(
                           index,
-                          showResults ? [selectedItem!] : arz,
+                          showResults ? widget.selectedItem : arz,
+                          onLongPress: () {
+                            if (showResults && widget.selectedItem.isNotEmpty) {
+                              setState(() {
+                                widget.selectedItem.removeAt(index);
+                                if (widget.selectedItem.isEmpty) {
+                                  showResults = false;
+                                }
+                              });
+                              _showSnakeBar(context, 'آیتم حذف شد');
+                            }
+                          },
                         );
                       },
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -187,7 +190,6 @@ class _homepageState extends State<homepage> {
               ),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: buildFloatingSearchBar(),
@@ -198,7 +200,6 @@ class _homepageState extends State<homepage> {
   }
 
   TextEditingController searchController = TextEditingController();
-
   String currentQuery = '';
 
   Widget buildFloatingSearchBar() {
@@ -211,7 +212,7 @@ class _homepageState extends State<homepage> {
       transitionDuration: const Duration(milliseconds: 600),
       transitionCurve: Curves.easeInOut,
       physics: const BouncingScrollPhysics(),
-      width: isPortrait ? 600 : 500,
+      width: isPortrait ? 600 : 700,
       axisAlignment: isPortrait ? 0.0 : -1.0,
       openAxisAlignment: 0.0,
       debounceDelay: const Duration(milliseconds: 300),
@@ -227,12 +228,10 @@ class _homepageState extends State<homepage> {
                   .toList();
         });
       },
-
       transition: CircularFloatingSearchBarTransition(),
       actions: [FloatingSearchBarAction.searchToClear()],
       builder: (context, transition) {
-        if (currentQuery.isEmpty)
-          return SizedBox.shrink(); // وقتی متن خالیه، چیزی نمایش نده
+        if (currentQuery.isEmpty) return SizedBox.shrink();
 
         final displayList = filteredItems.isEmpty ? arz : filteredItems;
 
@@ -246,11 +245,49 @@ class _homepageState extends State<homepage> {
               itemCount: displayList.length,
               itemBuilder: (context, index) {
                 final item = displayList[index];
+                final isAdded = widget.selectedItem.contains(item);
+
                 return ListTile(
-                  title: Text(item.title ?? ''),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.title ?? '',
+                          style: TextStyle(fontSize: 16),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          isAdded
+                              ? Icons.check_circle
+                              : Icons.add_circle_outline,
+                          color: isAdded ? Colors.green : Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            if (isAdded) {
+                              widget.selectedItem.remove(item);
+                            } else {
+                              widget.selectedItem.add(item);
+                            }
+                          });
+                          _showSnakeBar(
+                            context,
+                            isAdded ? 'آیتم حذف شد' : 'آیتم اضافه شد',
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                   onTap: () {
-                    searchController.text = item.title ?? '';
-                    filteredItems = [];
+                    setState(() {
+                      searchController.text = item.title ?? '';
+                      widget.selectedItem.clear();
+                      widget.selectedItem.add(item);
+                      showResults = true;
+                    });
                     FloatingSearchBar.of(context)?.close();
                   },
                 );
@@ -273,81 +310,81 @@ void _showSnakeBar(BuildContext context, String message) {
   );
 }
 
-//----------------------------------------------------
-
 class Items extends StatelessWidget {
-  int index;
-  List<Arzcurrency> arz;
-  Items(this.index, this.arz, {super.key});
+  final int index;
+  final List<Arzcurrency> arz;
+  final VoidCallback? onLongPress;
+
+  Items(this.index, this.arz, {super.key, this.onLongPress});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-      child: Container(
-        decoration: BoxDecoration(
-          boxShadow: <BoxShadow>[
-            BoxShadow(blurRadius: 1.0, color: Colors.purple),
-          ],
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(15),
-        ),
-
-        width: double.infinity,
-        height: 55,
-
-        child: Column(
-          spacing: 50,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    child: Image.network(
-                      "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    arz[index].title!,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  arz[index].price!,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                SizedBox(width: 8),
-                Row(
+    return GestureDetector(
+      onLongPress: onLongPress,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+        child: Container(
+          decoration: BoxDecoration(
+            boxShadow: <BoxShadow>[
+              BoxShadow(blurRadius: 1.0, color: Colors.purple),
+            ],
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      arz[index].changes!,
-                      style:
-                          arz[index].status == "n"
-                              ? Theme.of(context).textTheme.headlineSmall
-                              : Theme.of(context).textTheme.headlineLarge,
+                    CircleAvatar(
+                      child: Image.network(
+                        "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                    SizedBox(width: 4),
-                    Icon(
-                      arz[index].status == "n"
-                          ? Icons.arrow_downward
-                          : Icons.arrow_upward,
-                      color:
-                          arz[index].status == "n" ? Colors.red : Colors.green,
+                    SizedBox(width: 10),
+                    Text(
+                      arz[index].title!,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                 ),
-              ],
-            ),
-          ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    arz[index].price!,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  SizedBox(width: 8),
+                  Row(
+                    children: [
+                      Text(
+                        arz[index].changes!,
+                        style:
+                            arz[index].status == "n"
+                                ? Theme.of(context).textTheme.headlineSmall
+                                : Theme.of(context).textTheme.headlineLarge,
+                      ),
+                      SizedBox(width: 4),
+                      Icon(
+                        arz[index].status == "n"
+                            ? Icons.arrow_downward
+                            : Icons.arrow_upward,
+                        color:
+                            arz[index].status == "n"
+                                ? Colors.red
+                                : Colors.green,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
