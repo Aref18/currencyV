@@ -371,7 +371,12 @@ class Items extends StatelessWidget {
               ],
               color: isFocused ? Colors.grey[800] : Colors.black,
               border:
-                  isFocused ? Border.all(color: Colors.red, width: 2) : null,
+                  isFocused
+                      ? Border.all(
+                        color: const Color.fromARGB(255, 182, 23, 12),
+                        width: 2,
+                      )
+                      : null,
               borderRadius: BorderRadius.circular(15),
             ),
             child: Stack(
@@ -401,6 +406,7 @@ class Items extends StatelessWidget {
                         ],
                       ),
                     ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
