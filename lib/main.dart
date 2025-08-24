@@ -69,6 +69,7 @@ class homepage extends StatefulWidget {
 class _homepageState extends State<homepage> {
   List<Arzcurrency> arz = [];
   int? focusedIndex; // برای ردیابی آیتم فوکوس‌شده
+  bool isVertical = false; // وضعیت نمایش (Grid یا Vertical)
 
   Future GetResponse(BuildContext cntx) async {
     var Url =
@@ -136,17 +137,28 @@ class _homepageState extends State<homepage> {
         elevation: 0,
         backgroundColor: const Color.fromARGB(113, 0, 0, 0),
         actions: [
-          SizedBox(width: 10),
-          CircleAvatar(
+          const SizedBox(width: 10),
+          const CircleAvatar(
             backgroundColor: Colors.white,
             backgroundImage: AssetImage('assets/images/V.png'),
             radius: 20,
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Text('ArzV', style: Theme.of(context).textTheme.bodyLarge),
-          Spacer(),
-          Icon(Icons.menu),
-          SizedBox(width: 10),
+          const Spacer(),
+          // 🔽 آیکون منو برای تغییر حالت
+          IconButton(
+            icon: Icon(
+              isVertical ? Icons.list : Icons.grid_view,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              setState(() {
+                isVertical = !isVertical; // تغییر حالت
+              });
+            },
+          ),
+          const SizedBox(width: 10),
         ],
       ),
       body: Stack(
@@ -156,7 +168,7 @@ class _homepageState extends State<homepage> {
               padding: const EdgeInsets.all(25.0),
               child: Column(
                 children: [
-                  SizedBox(height: 60),
+                  const SizedBox(height: 60),
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
@@ -164,51 +176,96 @@ class _homepageState extends State<homepage> {
                           focusedIndex = null;
                         });
                       },
-                      child: GridView.builder(
-                        physics: BouncingScrollPhysics(),
-                        clipBehavior: Clip.none, // ✅ مهم
-                        itemCount:
-                            showResults
-                                ? widget.selectedItem.length
-                                : arz.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Items(
-                            index,
-                            showResults ? widget.selectedItem : arz,
-                            isFocused: focusedIndex == index,
-                            onLongPress: () {
-                              setState(() {
-                                focusedIndex = index;
-                              });
-                            },
-                            onTap: () {
-                              setState(() {
-                                focusedIndex = null;
-                              });
-                            },
-                            onDelete: () {
-                              setState(() {
-                                if (showResults) {
-                                  widget.selectedItem.removeAt(index);
-                                  if (widget.selectedItem.isEmpty) {
-                                    showResults = false;
-                                  }
-                                } else {
-                                  arz.removeAt(index);
-                                }
-                                focusedIndex = null;
-                              });
-                              _showSnakeBar(context, 'آیتم حذف شد');
-                            },
-                          );
-                        },
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: _getCrossAxisCount(context),
-                          childAspectRatio: _getAspectRatio(context),
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                        ),
-                      ),
+                      child:
+                          isVertical
+                              ? ListView.builder(
+                                physics: const BouncingScrollPhysics(),
+                                itemCount:
+                                    showResults
+                                        ? widget.selectedItem.length
+                                        : arz.length,
+                                itemBuilder: (context, index) {
+                                  return Items(
+                                    index,
+                                    showResults ? widget.selectedItem : arz,
+                                    isFocused: focusedIndex == index,
+                                    onLongPress: () {
+                                      setState(() {
+                                        focusedIndex = index;
+                                      });
+                                    },
+                                    onTap: () {
+                                      setState(() {
+                                        focusedIndex = null;
+                                      });
+                                    },
+                                    onDelete: () {
+                                      setState(() {
+                                        if (showResults) {
+                                          widget.selectedItem.removeAt(index);
+                                          if (widget.selectedItem.isEmpty) {
+                                            showResults = false;
+                                          }
+                                        } else {
+                                          arz.removeAt(index);
+                                        }
+                                        focusedIndex = null;
+                                      });
+                                      _showSnakeBar(context, 'آیتم حذف شد');
+                                    },
+                                  );
+                                },
+                              )
+                              : GridView.builder(
+                                physics: const BouncingScrollPhysics(),
+                                clipBehavior: Clip.none,
+                                itemCount:
+                                    showResults
+                                        ? widget.selectedItem.length
+                                        : arz.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Items(
+                                    index,
+                                    showResults ? widget.selectedItem : arz,
+                                    isFocused: focusedIndex == index,
+                                    onLongPress: () {
+                                      setState(() {
+                                        focusedIndex = index;
+                                      });
+                                    },
+                                    onTap: () {
+                                      setState(() {
+                                        focusedIndex = null;
+                                      });
+                                    },
+                                    onDelete: () {
+                                      setState(() {
+                                        if (showResults) {
+                                          widget.selectedItem.removeAt(index);
+                                          if (widget.selectedItem.isEmpty) {
+                                            showResults = false;
+                                          }
+                                        } else {
+                                          arz.removeAt(index);
+                                        }
+                                        focusedIndex = null;
+                                      });
+                                      _showSnakeBar(context, 'آیتم حذف شد');
+                                    },
+                                  );
+                                },
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: _getCrossAxisCount(
+                                        context,
+                                      ),
+                                      childAspectRatio: _getAspectRatio(
+                                        context,
+                                      ),
+                                      crossAxisSpacing: 12,
+                                      mainAxisSpacing: 12,
+                                    ),
+                              ),
                     ),
                   ),
                 ],
@@ -230,6 +287,7 @@ class _homepageState extends State<homepage> {
   Widget buildFloatingSearchBar() {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.landscape;
+
     return FloatingSearchBar(
       hint: 'جستجوی رمز ارز...',
       queryStyle: TextStyle(color: Colors.black),
@@ -342,6 +400,7 @@ class Items extends StatelessWidget {
   final VoidCallback? onLongPress;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
+  final isVertical;
 
   Items(
     this.index,
@@ -351,17 +410,19 @@ class Items extends StatelessWidget {
     this.onLongPress,
     this.onTap,
     this.onDelete,
+    this.isVertical = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return GestureDetector(
       onLongPress: onLongPress,
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
         child: Transform.scale(
-          scale: isFocused ? 1.1 : 1.0, // ✅ بزرگ‌نمایی تمیز
+          scale: isFocused ? 1.1 : 1.0,
           child: AnimatedContainer(
             duration: Duration(milliseconds: 200),
             clipBehavior: Clip.antiAlias,
@@ -395,7 +456,7 @@ class Items extends StatelessWidget {
                               fit: BoxFit.cover,
                             ),
                           ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               arz[index].title!,
@@ -406,7 +467,7 @@ class Items extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -414,7 +475,7 @@ class Items extends StatelessWidget {
                           arz[index].price!,
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Row(
                           children: [
                             Text(
@@ -428,7 +489,7 @@ class Items extends StatelessWidget {
                                         context,
                                       ).textTheme.headlineLarge,
                             ),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Icon(
                               arz[index].status == "n"
                                   ? Icons.arrow_downward
@@ -453,14 +514,14 @@ class Items extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
-                        minimumSize: Size(60, 30),
-                        padding: EdgeInsets.symmetric(
+                        minimumSize: const Size(60, 30),
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 4,
                         ),
-                        textStyle: TextStyle(fontSize: 14),
+                        textStyle: const TextStyle(fontSize: 14),
                       ),
-                      child: Text('حذف'),
+                      child: const Text('حذف'),
                     ),
                   ),
               ],
