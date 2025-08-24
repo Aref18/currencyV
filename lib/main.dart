@@ -68,6 +68,7 @@ class homepage extends StatefulWidget {
 
 class _homepageState extends State<homepage> {
   List<Arzcurrency> arz = [];
+  int? focusedIndex; // برای ردیابی آیتم فوکوس‌شده
 
   Future GetResponse(BuildContext cntx) async {
     var Url =
@@ -157,32 +158,60 @@ class _homepageState extends State<homepage> {
                 children: [
                   SizedBox(height: 60),
                   Expanded(
-                    child: GridView.builder(
-                      physics: BouncingScrollPhysics(),
-                      itemCount:
-                          showResults ? widget.selectedItem.length : arz.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Items(
-                          index,
-                          showResults ? widget.selectedItem : arz,
-                          onLongPress: () {
-                            if (showResults && widget.selectedItem.isNotEmpty) {
+                    child: GestureDetector(
+                      onTap: () {
+                        // پاک کردن فوکوس با تپ روی پس‌زمینه
+                        setState(() {
+                          focusedIndex = null;
+                        });
+                      },
+                      child: GridView.builder(
+                        physics: BouncingScrollPhysics(),
+                        itemCount:
+                            showResults
+                                ? widget.selectedItem.length
+                                : arz.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Items(
+                            index,
+                            showResults ? widget.selectedItem : arz,
+                            isFocused: focusedIndex == index,
+                            onLongPress: () {
+                              print(
+                                "Long press on item: ${showResults ? widget.selectedItem[index].title : arz[index].title}",
+                              );
                               setState(() {
-                                widget.selectedItem.removeAt(index);
-                                if (widget.selectedItem.isEmpty) {
-                                  showResults = false;
+                                focusedIndex = index; // تنظیم آیتم فوکوس‌شده
+                              });
+                            },
+                            onTap: () {
+                              // پاک کردن فوکوس با تپ روی آیتم
+                              setState(() {
+                                focusedIndex = null;
+                              });
+                            },
+                            onDelete: () {
+                              setState(() {
+                                if (showResults) {
+                                  widget.selectedItem.removeAt(index);
+                                  if (widget.selectedItem.isEmpty) {
+                                    showResults = false;
+                                  }
+                                } else {
+                                  arz.removeAt(index); // حذف از لیست اصلی
                                 }
+                                focusedIndex = null; // حذف فوکوس
                               });
                               _showSnakeBar(context, 'آیتم حذف شد');
-                            }
-                          },
-                        );
-                      },
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: _getCrossAxisCount(context),
-                        childAspectRatio: _getAspectRatio(context),
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
+                            },
+                          );
+                        },
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: _getCrossAxisCount(context),
+                          childAspectRatio: _getAspectRatio(context),
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
                       ),
                     ),
                   ),
@@ -313,76 +342,129 @@ void _showSnakeBar(BuildContext context, String message) {
 class Items extends StatelessWidget {
   final int index;
   final List<Arzcurrency> arz;
+  final bool isFocused;
   final VoidCallback? onLongPress;
+  final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
-  Items(this.index, this.arz, {super.key, this.onLongPress});
+  Items(
+    this.index,
+    this.arz, {
+    super.key,
+    this.isFocused = false,
+    this.onLongPress,
+    this.onTap,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPress: onLongPress,
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-        child: Container(
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          transform:
+              isFocused
+                  ? Matrix4.diagonal3Values(1.1, 1.1, 1) // بزرگ شدن آیتم
+                  : Matrix4.identity(),
           decoration: BoxDecoration(
             boxShadow: <BoxShadow>[
               BoxShadow(blurRadius: 1.0, color: Colors.purple),
             ],
-            color: Colors.black,
+            color:
+                isFocused
+                    ? Colors.grey[800]
+                    : Colors.black, // تغییر رنگ برای فوکوس
+            border:
+                isFocused
+                    ? Border.all(
+                      color: Colors.black,
+                      width: 2,
+                    ) // حاشیه زرد برای فوکوس
+                    : null,
             borderRadius: BorderRadius.circular(15),
           ),
-          child: Column(
+          child: Stack(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      child: Image.network(
-                        "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      arz[index].title!,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              Column(
                 children: [
-                  Text(
-                    arz[index].price!,
-                    style: Theme.of(context).textTheme.bodyLarge,
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          child: Image.network(
+                            "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            arz[index].title!,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(width: 8),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(
-                        arz[index].changes!,
-                        style:
-                            arz[index].status == "n"
-                                ? Theme.of(context).textTheme.headlineSmall
-                                : Theme.of(context).textTheme.headlineLarge,
+                        arz[index].price!,
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                      SizedBox(width: 4),
-                      Icon(
-                        arz[index].status == "n"
-                            ? Icons.arrow_downward
-                            : Icons.arrow_upward,
-                        color:
+                      SizedBox(width: 8),
+                      Row(
+                        children: [
+                          Text(
+                            arz[index].changes!,
+                            style:
+                                arz[index].status == "n"
+                                    ? Theme.of(context).textTheme.headlineSmall
+                                    : Theme.of(context).textTheme.headlineLarge,
+                          ),
+                          SizedBox(width: 4),
+                          Icon(
                             arz[index].status == "n"
-                                ? Colors.red
-                                : Colors.green,
+                                ? Icons.arrow_downward
+                                : Icons.arrow_upward,
+                            color:
+                                arz[index].status == "n"
+                                    ? Colors.red
+                                    : Colors.green,
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ],
               ),
+              if (isFocused)
+                Positioned(
+                  top: 110,
+                  right: 90,
+                  child: ElevatedButton(
+                    onPressed: onDelete,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red, // رنگ پس‌زمینه دکمه
+                      foregroundColor: Colors.white, // رنگ متن
+                      minimumSize: Size(60, 30), // اندازه دکمه
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 2,
+                      ),
+                      textStyle: TextStyle(fontSize: 18),
+                    ),
+                    child: Text('حذف'),
+                  ),
+                ),
             ],
           ),
         ),
