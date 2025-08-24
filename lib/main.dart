@@ -160,13 +160,13 @@ class _homepageState extends State<homepage> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        // پاک کردن فوکوس با تپ روی پس‌زمینه
                         setState(() {
                           focusedIndex = null;
                         });
                       },
                       child: GridView.builder(
                         physics: BouncingScrollPhysics(),
+                        clipBehavior: Clip.none, // ✅ مهم
                         itemCount:
                             showResults
                                 ? widget.selectedItem.length
@@ -177,15 +177,11 @@ class _homepageState extends State<homepage> {
                             showResults ? widget.selectedItem : arz,
                             isFocused: focusedIndex == index,
                             onLongPress: () {
-                              print(
-                                "Long press on item: ${showResults ? widget.selectedItem[index].title : arz[index].title}",
-                              );
                               setState(() {
-                                focusedIndex = index; // تنظیم آیتم فوکوس‌شده
+                                focusedIndex = index;
                               });
                             },
                             onTap: () {
-                              // پاک کردن فوکوس با تپ روی آیتم
                               setState(() {
                                 focusedIndex = null;
                               });
@@ -198,9 +194,9 @@ class _homepageState extends State<homepage> {
                                     showResults = false;
                                   }
                                 } else {
-                                  arz.removeAt(index); // حذف از لیست اصلی
+                                  arz.removeAt(index);
                                 }
-                                focusedIndex = null; // حذف فوکوس
+                                focusedIndex = null;
                               });
                               _showSnakeBar(context, 'آیتم حذف شد');
                             },
@@ -209,8 +205,8 @@ class _homepageState extends State<homepage> {
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: _getCrossAxisCount(context),
                           childAspectRatio: _getAspectRatio(context),
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
                         ),
                       ),
                     ),
@@ -364,108 +360,105 @@ class Items extends StatelessWidget {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-        child: AnimatedContainer(
-          duration: Duration(milliseconds: 200),
-          transform:
-              isFocused
-                  ? Matrix4.diagonal3Values(1.1, 1.1, 1) // بزرگ شدن آیتم
-                  : Matrix4.identity(),
-          decoration: BoxDecoration(
-            boxShadow: <BoxShadow>[
-              BoxShadow(blurRadius: 1.0, color: Colors.purple),
-            ],
-            color:
-                isFocused
-                    ? Colors.grey[800]
-                    : Colors.black, // تغییر رنگ برای فوکوس
-            border:
-                isFocused
-                    ? Border.all(
-                      color: Colors.black,
-                      width: 2,
-                    ) // حاشیه زرد برای فوکوس
-                    : null,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Stack(
-            children: [
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          child: Image.network(
-                            "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            arz[index].title!,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                        arz[index].price!,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      SizedBox(width: 8),
-                      Row(
+        child: Transform.scale(
+          scale: isFocused ? 1.1 : 1.0, // ✅ بزرگ‌نمایی تمیز
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              boxShadow: <BoxShadow>[
+                BoxShadow(blurRadius: 1.0, color: Colors.purple),
+              ],
+              color: isFocused ? Colors.grey[800] : Colors.black,
+              border:
+                  isFocused ? Border.all(color: Colors.red, width: 2) : null,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text(
-                            arz[index].changes!,
-                            style:
-                                arz[index].status == "n"
-                                    ? Theme.of(context).textTheme.headlineSmall
-                                    : Theme.of(context).textTheme.headlineLarge,
+                          CircleAvatar(
+                            child: Image.network(
+                              "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                          SizedBox(width: 4),
-                          Icon(
-                            arz[index].status == "n"
-                                ? Icons.arrow_downward
-                                : Icons.arrow_upward,
-                            color:
-                                arz[index].status == "n"
-                                    ? Colors.red
-                                    : Colors.green,
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              arz[index].title!,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ],
-              ),
-              if (isFocused)
-                Positioned(
-                  top: 110,
-                  right: 90,
-                  child: ElevatedButton(
-                    onPressed: onDelete,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red, // رنگ پس‌زمینه دکمه
-                      foregroundColor: Colors.white, // رنگ متن
-                      minimumSize: Size(60, 30), // اندازه دکمه
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 2,
-                      ),
-                      textStyle: TextStyle(fontSize: 18),
                     ),
-                    child: Text('حذف'),
-                  ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          arz[index].price!,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        SizedBox(width: 8),
+                        Row(
+                          children: [
+                            Text(
+                              arz[index].changes!,
+                              style:
+                                  arz[index].status == "n"
+                                      ? Theme.of(
+                                        context,
+                                      ).textTheme.headlineSmall
+                                      : Theme.of(
+                                        context,
+                                      ).textTheme.headlineLarge,
+                            ),
+                            SizedBox(width: 4),
+                            Icon(
+                              arz[index].status == "n"
+                                  ? Icons.arrow_downward
+                                  : Icons.arrow_upward,
+                              color:
+                                  arz[index].status == "n"
+                                      ? Colors.red
+                                      : Colors.green,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-            ],
+                if (isFocused)
+                  Positioned(
+                    top: 110,
+                    right: 100,
+                    child: ElevatedButton(
+                      onPressed: onDelete,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        minimumSize: Size(60, 30),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        textStyle: TextStyle(fontSize: 14),
+                      ),
+                      child: Text('حذف'),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
