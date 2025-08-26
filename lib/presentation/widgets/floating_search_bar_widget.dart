@@ -54,29 +54,34 @@ class _FloatingSearchBarWidgetState extends State<FloatingSearchBarWidget> {
       onQueryChanged: (query) {
         print('Query changed: $query'); // دیباگ
         widget.onQueryChanged(query);
-        setState(() {}); // به‌روزرسانی UI هنگام تغییر query
+        setState(() {
+          if (query.isNotEmpty) {
+            _controller.open(); // باز کردن پاپ‌آپ فقط وقتی query غیرخالی است
+          } else {
+            _controller.close(); // بستن پاپ‌آپ وقتی query خالی است
+          }
+        });
       },
       onFocusChanged: (isFocused) {
-        if (isFocused) {
-          _controller.open(); // باز کردن پاپ‌آپ هنگام فوکوس
-        } else {
-          _controller.query = ''; // پاک کردن query هنگام بسته شدن
-          widget.onQueryChanged('');
+        if (!isFocused && _controller.query.isEmpty) {
+          _controller
+              .close(); // بستن پاپ‌آپ وقتی فوکوس از دست می‌رود و query خالی است
         }
       },
       transition: CircularFloatingSearchBarTransition(),
       actions: [FloatingSearchBarAction.searchToClear(showIfClosed: false)],
       builder: (context, _) {
         final query = _controller.query.toLowerCase();
+        if (query.isEmpty) {
+          return const SizedBox.shrink(); // هیچ چیز نمایش داده نشود وقتی query خالی است
+        }
+
         final filteredItems =
-            query.isEmpty
-                ? widget.arz
-                : widget.arz
-                    .where(
-                      (item) =>
-                          (item.title ?? '').toLowerCase().contains(query),
-                    )
-                    .toList();
+            widget.arz
+                .where(
+                  (item) => (item.title ?? '').toLowerCase().contains(query),
+                )
+                .toList();
 
         return ClipRRect(
           borderRadius: BorderRadius.circular(8),
@@ -89,7 +94,7 @@ class _FloatingSearchBarWidgetState extends State<FloatingSearchBarWidget> {
                       padding: EdgeInsets.all(16),
                       child: Text(
                         'هیچ نتیجه‌ای یافت نشد',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
+                        style: TextStyle(fontSize: 16),
                       ),
                     )
                     : ListView.builder(
@@ -120,13 +125,13 @@ class _FloatingSearchBarWidgetState extends State<FloatingSearchBarWidget> {
                           ),
                           title: Text(
                             item.title ?? 'بدون عنوان',
-                            style: const TextStyle(fontSize: 20),
+                            style: const TextStyle(fontSize: 16),
                             overflow: TextOverflow.ellipsis,
                           ),
                           subtitle: Text(
-                            item.price ?? '10',
+                            item.price ?? '0',
                             style: const TextStyle(
-                              fontSize: 18,
+                              fontSize: 14,
                               color: Colors.grey,
                             ),
                           ),
