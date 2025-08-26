@@ -19,3 +19,9 @@ class Arzcurrency {
 
   void add(Arzcurrency item) {}
 }
+
+class ItemModel {
+  final String? title;
+
+  ItemModel({this.title});
+}

@@ -1,0 +1,4 @@
+class ApiConstants {
+  static const String apiUrl =
+      'https://sasansafari.com/flutter/api.php?access_key=flutter123456';
+}
