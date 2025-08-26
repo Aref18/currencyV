@@ -84,7 +84,7 @@ class GridItemWidget extends StatelessWidget {
                               arz[index].price!,
                               style: Theme.of(
                                 context,
-                              ).textTheme.bodyLarge!.copyWith(fontSize: 15),
+                              ).textTheme.bodyLarge!.copyWith(fontSize: 17),
                             ),
                             const SizedBox(width: 30),
                             Text(
