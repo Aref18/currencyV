@@ -2,7 +2,7 @@ import 'package:currencyv/core/utils/snackbar_utils.dart';
 import 'package:currencyv/data/model/arz.dart';
 import 'package:flutter/material.dart';
 
-class CurrencyItemWidget extends StatelessWidget {
+class GridItemWidget extends StatelessWidget {
   final int index;
   final List<Arzcurrency> arz;
   final bool isFocused;
@@ -10,7 +10,7 @@ class CurrencyItemWidget extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
 
-  const CurrencyItemWidget({
+  const GridItemWidget({
     super.key,
     required this.index,
     required this.arz,
@@ -26,17 +26,15 @@ class CurrencyItemWidget extends StatelessWidget {
       onLongPress: onLongPress,
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-        child: Transform.scale(
-          scale: isFocused ? 1.1 : 1.0,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            clipBehavior: Clip.antiAlias,
+        padding: const EdgeInsets.fromLTRB(0, 8.0, 0, 8.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Container(
             decoration: BoxDecoration(
               boxShadow: const <BoxShadow>[
                 BoxShadow(blurRadius: 1.0, color: Colors.purple),
               ],
-              color: isFocused ? Colors.grey[800] : Colors.black,
+              color: isFocused ? Colors.grey[800] : Colors.grey[800],
               border:
                   isFocused
                       ? Border.all(
@@ -49,14 +47,14 @@ class CurrencyItemWidget extends StatelessWidget {
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    children: [
+                      Row(
                         children: [
                           const CircleAvatar(
+                            radius: 16,
                             child: Image(
                               image: NetworkImage(
                                 "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
@@ -64,28 +62,31 @@ class CurrencyItemWidget extends StatelessWidget {
                               fit: BoxFit.cover,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               arz[index].title!,
-                              style: Theme.of(context).textTheme.bodyLarge,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyLarge!.copyWith(fontSize: 19),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          arz[index].price!,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        const SizedBox(width: 8),
-                        Row(
+
+                      Padding(
+                        padding: const EdgeInsets.only(top: 30),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            Text(
+                              arz[index].price!,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyLarge!.copyWith(fontSize: 15),
+                            ),
+                            const SizedBox(width: 30),
                             Text(
                               arz[index].changes!,
                               style:
@@ -106,33 +107,36 @@ class CurrencyItemWidget extends StatelessWidget {
                                   arz[index].status == "n"
                                       ? Colors.red
                                       : Colors.green,
+                              size: 20,
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
                 if (isFocused)
                   Positioned(
-                    top: 110,
-                    right: 100,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        onDelete?.call();
-                        showSnackBar(context, 'آیتم حذف شد');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size(60, 30),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        textStyle: const TextStyle(fontSize: 14),
+                    bottom: 6, // پایین سمت چپ
+                    left: 6,
+                    child: Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text('حذف'),
+                      child: TextButton(
+                        onPressed: () {
+                          onDelete?.call();
+                          showSnackBar(context, 'آیتم حذف شد');
+                        },
+                        child: Center(
+                          child: const Text(
+                            'حذف',
+                            style: TextStyle(color: Colors.white, fontSize: 15),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
               ],

@@ -1,7 +1,8 @@
 import 'package:currencyv/data/model/arz.dart';
 import 'package:currencyv/data/services/api_service.dart';
-import 'package:currencyv/presentation/widgets/currency_item_widget.dart';
 import 'package:currencyv/presentation/widgets/floating_search_bar_widget.dart';
+import 'package:currencyv/presentation/widgets/grid_item_widget.dart';
+import 'package:currencyv/presentation/widgets/list_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 
@@ -109,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ? selectedItem.length
                                         : arz.length,
                                 itemBuilder: (context, index) {
-                                  return CurrencyItemWidget(
+                                  return ListItemWidget(
                                     index: index,
                                     arz: showResults ? selectedItem : arz,
                                     isFocused: focusedIndex == index,
@@ -147,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ? selectedItem.length
                                         : arz.length,
                                 itemBuilder: (context, index) {
-                                  return CurrencyItemWidget(
+                                  return GridItemWidget(
                                     index: index,
                                     arz: showResults ? selectedItem : arz,
                                     isFocused: focusedIndex == index,
