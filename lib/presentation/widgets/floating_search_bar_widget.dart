@@ -41,7 +41,7 @@ class _FloatingSearchBarWidgetState extends State<FloatingSearchBarWidget> {
     return FloatingSearchBar(
       controller: _controller,
       hint: 'جستجوی رمز ارز...',
-      queryStyle: const TextStyle(color: Colors.black),
+      queryStyle: const TextStyle(color: Colors.black, fontSize: 16),
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 600),
       transitionCurve: Curves.easeInOut,
@@ -50,9 +50,19 @@ class _FloatingSearchBarWidgetState extends State<FloatingSearchBarWidget> {
       axisAlignment: isPortrait ? 0.0 : -1.0,
       openAxisAlignment: 0.0,
       debounceDelay: const Duration(milliseconds: 300),
+      automaticallyImplyBackButton: false,
       onQueryChanged: (query) {
         print('Query changed: $query'); // دیباگ
         widget.onQueryChanged(query);
+        setState(() {}); // به‌روزرسانی UI هنگام تغییر query
+      },
+      onFocusChanged: (isFocused) {
+        if (isFocused) {
+          _controller.open(); // باز کردن پاپ‌آپ هنگام فوکوس
+        } else {
+          _controller.query = ''; // پاک کردن query هنگام بسته شدن
+          widget.onQueryChanged('');
+        }
       },
       transition: CircularFloatingSearchBarTransition(),
       actions: [FloatingSearchBarAction.searchToClear(showIfClosed: false)],
@@ -75,19 +85,50 @@ class _FloatingSearchBarWidgetState extends State<FloatingSearchBarWidget> {
             elevation: 4.0,
             child:
                 filteredItems.isEmpty
-                    ? const ListTile(title: Text('هیچ نتیجه‌ای یافت نشد'))
+                    ? const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'هیچ نتیجه‌ای یافت نشد',
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                    )
                     : ListView.builder(
                       shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 8,
+                      ),
                       itemCount: filteredItems.length,
                       itemBuilder: (context, index) {
                         final item = filteredItems[index];
                         final isSelected = widget.selectedItem.contains(item);
 
                         return ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          leading: CircleAvatar(
+                            radius: 16,
+                            child: Image(
+                              image: NetworkImage(
+                                item.imageUrl ??
+                                    'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                           title: Text(
                             item.title ?? 'بدون عنوان',
-                            style: const TextStyle(fontSize: 16),
+                            style: const TextStyle(fontSize: 20),
                             overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(
+                            item.price ?? '10',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey,
+                            ),
                           ),
                           trailing: IconButton(
                             icon: Icon(

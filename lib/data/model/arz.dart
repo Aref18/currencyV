@@ -5,6 +5,8 @@ class Arzcurrency {
   String? changes;
   String? status;
 
+  var imageUrl;
+
   Arzcurrency({
     required this.id,
     required this.title,
