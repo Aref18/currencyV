@@ -80,7 +80,7 @@ class ListItemWidget extends StatelessWidget {
                         arz[index].price!,
                         style: Theme.of(
                           context,
-                        ).textTheme.bodyLarge!.copyWith(fontSize: 17),
+                        ).textTheme.bodyLarge!.copyWith(fontSize: 22),
                       ),
                       const SizedBox(width: 8),
                       // تغییرات و فلش

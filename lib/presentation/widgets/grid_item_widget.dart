@@ -84,9 +84,9 @@ class GridItemWidget extends StatelessWidget {
                               arz[index].price!,
                               style: Theme.of(
                                 context,
-                              ).textTheme.bodyLarge!.copyWith(fontSize: 17),
+                              ).textTheme.bodyLarge!.copyWith(fontSize: 22),
                             ),
-                            const SizedBox(width: 30),
+                            const SizedBox(width: 15),
                             Text(
                               arz[index].changes!,
                               style:
@@ -120,7 +120,7 @@ class GridItemWidget extends StatelessWidget {
                     bottom: 6, // پایین سمت چپ
                     left: 6,
                     child: Container(
-                      height: 40,
+                      height: 35,
                       decoration: BoxDecoration(
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(20),

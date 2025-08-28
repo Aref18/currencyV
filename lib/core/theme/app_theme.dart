@@ -4,11 +4,11 @@ class AppTheme {
   static ThemeData get theme => ThemeData(
     textTheme: TextTheme(
       headlineLarge: TextStyle(
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: FontWeight.w700,
         color: Colors.green,
       ),
-      headlineSmall: TextStyle(fontSize: 18, color: Colors.red),
+      headlineSmall: TextStyle(fontSize: 14, color: Colors.red),
       bodyLarge: TextStyle(
         fontSize: 17,
         fontWeight: FontWeight.w500,
