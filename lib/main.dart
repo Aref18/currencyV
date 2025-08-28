@@ -1,6 +1,7 @@
 import 'package:currencyv/core/theme/app_theme.dart';
 import 'package:currencyv/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
