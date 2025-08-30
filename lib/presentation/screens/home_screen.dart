@@ -16,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Arzcurrency> arz = [];
   List<Arzcurrency> selectedItem = [];
+  List<Arzcurrency> visiblecurrency = [];
   List<ItemModel> allItems = List.generate(
     20,
     (index) => ItemModel(title: "آیتم شماره $index"),
@@ -32,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FloatingSearchBar.of(context)?.open();
     });
+    visiblecurrency = arz.take(4).toList();
   }
 
   void fetchCurrencies() async {
