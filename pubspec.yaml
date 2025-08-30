@@ -67,16 +67,16 @@ flutter_launcher_icons:
 
 
 flutter_native_splash:
-  image: assets/images/ArzV.png
-  color: "###706e6e"
-  android_gravity: fill
-  fullscreen: true
+  color: "#000000"               # رنگ پس‌زمینه
+  image: assets/images/blacks.png  # تصویر تمام صفحه
+  android: true
+  ios: true
+  web: false
+
   android_12:
-    android_gravity: fill
-    fullscreen: true
-    image: assets/images/ArzV.png
-    color: "###706e6e"
-    
+    icon_background_color: "#000000"   # رنگ پشت تصویر (مشکی)
+    image: assets/images/blacks.png    # همین تصویر را دوباره برای اندروید 12
+
     
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -101,6 +101,7 @@ flutter:
   assets:
      - assets/images/V.png
      - assets/images/ArzV.png
+     - assets/images/blacks.png
   #   - images/a_dot_ham.jpeg
 
 
