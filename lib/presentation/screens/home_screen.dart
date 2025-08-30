@@ -4,7 +4,6 @@ import 'package:currencyv/presentation/widgets/floating_search_bar_widget.dart';
 import 'package:currencyv/presentation/widgets/grid_item_widget.dart';
 import 'package:currencyv/presentation/widgets/list_item_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,24 +15,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Arzcurrency> arz = [];
   List<Arzcurrency> selectedItem = [];
-  List<Arzcurrency> visiblecurrency = [];
-  List<ItemModel> allItems = List.generate(
-    20,
-    (index) => ItemModel(title: "آیتم شماره $index"),
-  );
   int? focusedIndex;
   bool isVertical = false;
-  List<Arzcurrency> filteredItems = [];
   bool showResults = false;
 
   @override
   void initState() {
     super.initState();
     fetchCurrencies();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FloatingSearchBar.of(context)?.open();
-    });
-    visiblecurrency = arz.take(4).toList();
   }
 
   void fetchCurrencies() async {
@@ -41,6 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
       final currencies = await ApiService.fetchCurrencies();
       setState(() {
         arz = currencies;
+        // ۴ آیتم اولیه روی صفحه نمایش داده شود
+        selectedItem = arz.take(4).toList();
       });
     }
   }
@@ -107,14 +98,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           isVertical
                               ? ListView.builder(
                                 physics: const BouncingScrollPhysics(),
-                                itemCount:
-                                    showResults
-                                        ? selectedItem.length
-                                        : arz.length,
+                                itemCount: selectedItem.length,
                                 itemBuilder: (context, index) {
                                   return ListItemWidget(
                                     index: index,
-                                    arz: showResults ? selectedItem : arz,
+                                    arz: selectedItem,
                                     isFocused: focusedIndex == index,
                                     onLongPress: () {
                                       setState(() {
@@ -128,14 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     },
                                     onDelete: () {
                                       setState(() {
-                                        if (showResults) {
-                                          selectedItem.removeAt(index);
-                                          if (selectedItem.isEmpty) {
-                                            showResults = false;
-                                          }
-                                        } else {
-                                          arz.removeAt(index);
-                                        }
+                                        selectedItem.removeAt(index);
                                         focusedIndex = null;
                                       });
                                     },
@@ -145,14 +126,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               : GridView.builder(
                                 physics: const BouncingScrollPhysics(),
                                 clipBehavior: Clip.none,
-                                itemCount:
-                                    showResults
-                                        ? selectedItem.length
-                                        : arz.length,
+                                itemCount: selectedItem.length,
                                 itemBuilder: (context, index) {
                                   return GridItemWidget(
                                     index: index,
-                                    arz: showResults ? selectedItem : arz,
+                                    arz: selectedItem,
                                     isFocused: focusedIndex == index,
                                     onLongPress: () {
                                       setState(() {
@@ -166,14 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     },
                                     onDelete: () {
                                       setState(() {
-                                        if (showResults) {
-                                          selectedItem.removeAt(index);
-                                          if (selectedItem.isEmpty) {
-                                            showResults = false;
-                                          }
-                                        } else {
-                                          arz.removeAt(index);
-                                        }
+                                        selectedItem.removeAt(index);
                                         focusedIndex = null;
                                       });
                                     },
@@ -202,30 +173,10 @@ class _HomeScreenState extends State<HomeScreen> {
             child: FloatingSearchBarWidget(
               arz: arz,
               selectedItem: selectedItem,
-              onQueryChanged: (query) {
-                setState(() {
-                  filteredItems =
-                      arz
-                          .where(
-                            (item) => item.title!.toLowerCase().contains(
-                              query.toLowerCase(),
-                            ),
-                          )
-                          .toList();
-                });
-              },
+              onQueryChanged: (query) {},
               onItemSelected: (item) {
                 setState(() {
-                  selectedItem.clear();
-                  selectedItem.add(item);
-                  showResults = true;
-                });
-              },
-              onItemToggled: (item, isAdded) {
-                setState(() {
-                  if (isAdded) {
-                    selectedItem.remove(item);
-                  } else {
+                  if (!selectedItem.contains(item)) {
                     selectedItem.add(item);
                   }
                 });
