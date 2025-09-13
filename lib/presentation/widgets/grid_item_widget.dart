@@ -26,38 +26,45 @@ class GridItemWidget extends StatelessWidget {
       onLongPress: onLongPress,
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 8.0, 0, 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(16),
           child: Container(
             decoration: BoxDecoration(
-              boxShadow: const <BoxShadow>[
-                BoxShadow(blurRadius: 1.0, color: Colors.purple),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1E1E1E), Color(0xFF2F4F4F)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
               ],
-              color: isFocused ? Colors.grey[800] : Colors.grey[800],
+              borderRadius: BorderRadius.circular(16),
               border:
                   isFocused
-                      ? Border.all(
-                        color: const Color.fromARGB(255, 182, 23, 12),
-                        width: 2,
-                      )
-                      : null,
-              borderRadius: BorderRadius.circular(15),
+                      ? Border.all(color: const Color(0xFFFFA500), width: 2)
+                      : null, // نارنجی برای کارت انتخاب شده
             ),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Column(
                     children: [
                       Row(
                         children: [
-                          const CircleAvatar(
-                            radius: 16,
+                          CircleAvatar(
+                            radius: 18,
+                            backgroundColor: Colors.transparent,
                             child: Image(
                               image: NetworkImage(
-                                "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
+                                arz[index].imageUrl ??
+                                    "https://cryptologos.cc/logos/bitcoin-btc-logo.png",
                               ),
                               fit: BoxFit.cover,
                             ),
@@ -65,7 +72,7 @@ class GridItemWidget extends StatelessWidget {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              arz[index].title!,
+                              arz[index].title ?? 'بدون عنوان',
                               style: Theme.of(
                                 context,
                               ).textTheme.bodyLarge!.copyWith(fontSize: 19),
@@ -74,55 +81,50 @@ class GridItemWidget extends StatelessWidget {
                           ),
                         ],
                       ),
-
-                      Padding(
-                        padding: const EdgeInsets.only(top: 30),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              arz[index].price!,
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodyLarge!.copyWith(fontSize: 22),
-                            ),
-                            const SizedBox(width: 15),
-                            Text(
-                              arz[index].changes!,
-                              style:
-                                  arz[index].status == "n"
-                                      ? Theme.of(
-                                        context,
-                                      ).textTheme.headlineSmall
-                                      : Theme.of(
-                                        context,
-                                      ).textTheme.headlineLarge,
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              arz[index].status == "n"
-                                  ? Icons.arrow_downward
-                                  : Icons.arrow_upward,
-                              color:
-                                  arz[index].status == "n"
-                                      ? Colors.red
-                                      : Colors.green,
-                              size: 20,
-                            ),
-                          ],
-                        ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            arz[index].price ?? '0',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyLarge!.copyWith(fontSize: 22),
+                          ),
+                          const SizedBox(width: 15),
+                          Text(
+                            arz[index].changes ?? '0',
+                            style:
+                                arz[index].status == "n"
+                                    ? Theme.of(context).textTheme.headlineSmall!
+                                        .copyWith(color: Colors.redAccent)
+                                    : Theme.of(context).textTheme.headlineLarge!
+                                        .copyWith(color: Color(0xFF00C853)),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            arz[index].status == "n"
+                                ? Icons.arrow_downward
+                                : Icons.arrow_upward,
+                            color:
+                                arz[index].status == "n"
+                                    ? Colors.redAccent
+                                    : const Color(0xFF00C853),
+                            size: 20,
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
                 if (isFocused)
                   Positioned(
-                    bottom: 6, // پایین سمت چپ
+                    bottom: 6,
                     left: 6,
                     child: Container(
-                      height: 35,
+                      height: 36,
                       decoration: BoxDecoration(
-                        color: Colors.red,
+                        color: const Color(0xFFFFA500), // نارنجی مدرن
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: TextButton(
@@ -130,10 +132,15 @@ class GridItemWidget extends StatelessWidget {
                           onDelete?.call();
                           showSnackBar(context, 'آیتم حذف شد');
                         },
-                        child: Center(
-                          child: const Text(
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
                             'حذف',
-                            style: TextStyle(color: Colors.white, fontSize: 15),
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
