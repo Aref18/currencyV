@@ -30,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final currencies = await ApiService.fetchCurrencies();
       setState(() {
         arz = currencies;
-        // ۴ آیتم اولیه روی صفحه نمایش داده شود
         selectedItem = arz.take(4).toList();
       });
     }
@@ -94,74 +93,89 @@ class _HomeScreenState extends State<HomeScreen> {
                           focusedIndex = null;
                         });
                       },
-                      child:
-                          isVertical
-                              ? ListView.builder(
-                                physics: const BouncingScrollPhysics(),
-                                itemCount: selectedItem.length,
-                                itemBuilder: (context, index) {
-                                  return ListItemWidget(
-                                    index: index,
-                                    arz: selectedItem,
-                                    isFocused: focusedIndex == index,
-                                    onLongPress: () {
-                                      setState(() {
-                                        focusedIndex = index;
-                                      });
-                                    },
-                                    onTap: () {
-                                      setState(() {
-                                        focusedIndex = null;
-                                      });
-                                    },
-                                    onDelete: () {
-                                      setState(() {
-                                        selectedItem.removeAt(index);
-                                        focusedIndex = null;
-                                      });
-                                    },
-                                  );
-                                },
-                              )
-                              : GridView.builder(
-                                physics: const BouncingScrollPhysics(),
-                                clipBehavior: Clip.none,
-                                itemCount: selectedItem.length,
-                                itemBuilder: (context, index) {
-                                  return GridItemWidget(
-                                    index: index,
-                                    arz: selectedItem,
-                                    isFocused: focusedIndex == index,
-                                    onLongPress: () {
-                                      setState(() {
-                                        focusedIndex = index;
-                                      });
-                                    },
-                                    onTap: () {
-                                      setState(() {
-                                        focusedIndex = null;
-                                      });
-                                    },
-                                    onDelete: () {
-                                      setState(() {
-                                        selectedItem.removeAt(index);
-                                        focusedIndex = null;
-                                      });
-                                    },
-                                  );
-                                },
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: _getCrossAxisCount(
-                                        context,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 400),
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0.3, 0),
+                                end: Offset.infinite,
+                              ).animate(animation),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child:
+                            isVertical
+                                ? ListView.builder(
+                                  physics: const BouncingScrollPhysics(),
+                                  itemCount: selectedItem.length,
+                                  itemBuilder: (context, index) {
+                                    return ListItemWidget(
+                                      index: index,
+                                      arz: selectedItem,
+                                      isFocused: focusedIndex == index,
+                                      onLongPress: () {
+                                        setState(() {
+                                          focusedIndex = index;
+                                        });
+                                      },
+                                      onTap: () {
+                                        setState(() {
+                                          focusedIndex = null;
+                                        });
+                                      },
+                                      onDelete: () {
+                                        setState(() {
+                                          selectedItem.removeAt(index);
+                                          focusedIndex = null;
+                                        });
+                                      },
+                                    );
+                                  },
+                                )
+                                : GridView.builder(
+                                  physics: const BouncingScrollPhysics(),
+                                  clipBehavior: Clip.none,
+                                  itemCount: selectedItem.length,
+                                  itemBuilder: (context, index) {
+                                    return GridItemWidget(
+                                      index: index,
+                                      arz: selectedItem,
+                                      isFocused: focusedIndex == index,
+                                      onLongPress: () {
+                                        setState(() {
+                                          focusedIndex = index;
+                                        });
+                                      },
+                                      onTap: () {
+                                        setState(() {
+                                          focusedIndex = null;
+                                        });
+                                      },
+                                      onDelete: () {
+                                        setState(() {
+                                          selectedItem.removeAt(index);
+                                          focusedIndex = null;
+                                        });
+                                      },
+                                    );
+                                  },
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: _getCrossAxisCount(
+                                          context,
+                                        ),
+                                        childAspectRatio: _getAspectRatio(
+                                          context,
+                                        ),
+                                        crossAxisSpacing: 12,
+                                        mainAxisSpacing: 12,
                                       ),
-                                      childAspectRatio: _getAspectRatio(
-                                        context,
-                                      ),
-                                      crossAxisSpacing: 12,
-                                      mainAxisSpacing: 12,
-                                    ),
-                              ),
+                                ),
+                      ),
                     ),
                   ),
                 ],
