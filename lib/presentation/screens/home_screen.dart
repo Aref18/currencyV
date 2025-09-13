@@ -96,12 +96,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 400),
                         transitionBuilder: (child, animation) {
+                          // می‌تونی نوع انیمیشن رو اینجا عوض کنی
                           return FadeTransition(
                             opacity: animation,
                             child: SlideTransition(
                               position: Tween<Offset>(
-                                begin: const Offset(0.3, 0),
-                                end: Offset.infinite,
+                                begin: const Offset(0.1, 0),
+                                end: Offset.zero,
                               ).animate(animation),
                               child: child,
                             ),
@@ -114,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   itemCount: selectedItem.length,
                                   itemBuilder: (context, index) {
                                     return ListItemWidget(
+                                      key: ValueKey(selectedItem[index].id),
                                       index: index,
                                       arz: selectedItem,
                                       isFocused: focusedIndex == index,
@@ -142,6 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   itemCount: selectedItem.length,
                                   itemBuilder: (context, index) {
                                     return GridItemWidget(
+                                      key: ValueKey(selectedItem[index].id),
                                       index: index,
                                       arz: selectedItem,
                                       isFocused: focusedIndex == index,
