@@ -92,7 +92,7 @@ class ListItemWidget extends StatelessWidget {
                       arz[index].changes ?? '0',
                       style:
                           arz[index].status == "n"
-                              ? Theme.of(context).textTheme.headlineSmall!
+                              ? Theme.of(context).textTheme.headlineLarge!
                                   .copyWith(color: Colors.redAccent)
                               : Theme.of(context).textTheme.headlineLarge!
                                   .copyWith(color: Color(0xFF00C853)),

@@ -4,7 +4,7 @@ class AppTheme {
   static ThemeData get theme => ThemeData(
     textTheme: TextTheme(
       headlineLarge: TextStyle(
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: FontWeight.w700,
         color: Colors.green,
       ),

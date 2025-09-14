@@ -32,7 +32,10 @@ class GridItemWidget extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF1E1E1E), Color(0xFF2F4F4F)],
+                colors: [
+                  Color.fromARGB(255, 0, 0, 0),
+                  Color.fromARGB(255, 89, 147, 147),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -91,12 +94,12 @@ class GridItemWidget extends StatelessWidget {
                               context,
                             ).textTheme.bodyLarge!.copyWith(fontSize: 22),
                           ),
-                          const SizedBox(width: 15),
+                          const SizedBox(width: 20),
                           Text(
                             arz[index].changes ?? '0',
                             style:
                                 arz[index].status == "n"
-                                    ? Theme.of(context).textTheme.headlineSmall!
+                                    ? Theme.of(context).textTheme.headlineLarge!
                                         .copyWith(color: Colors.redAccent)
                                     : Theme.of(context).textTheme.headlineLarge!
                                         .copyWith(color: Color(0xFF00C853)),

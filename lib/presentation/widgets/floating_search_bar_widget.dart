@@ -39,7 +39,7 @@ class _FloatingSearchBarWidgetState extends State<FloatingSearchBarWidget> {
       controller: _controller,
       hint: 'جستجوی رمز ارز...',
       queryStyle: const TextStyle(color: Colors.black, fontSize: 16),
-      shadowColor: const Color(0xFF00FFC6), // سبز نئونی برای cursor
+
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 600),
       physics: const BouncingScrollPhysics(),
