@@ -46,6 +46,8 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   icons_launcher: ^3.0.2
+  lottie: ^3.3.1
+
 icons_launcher:
   image_path: "assets/images/ArzV.png"
   platforms:
