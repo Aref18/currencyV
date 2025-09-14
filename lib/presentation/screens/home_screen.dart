@@ -56,13 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color.fromARGB(113, 0, 0, 0),
         actions: [
           const SizedBox(width: 10),
-          const CircleAvatar(
-            backgroundColor: Colors.white,
-            backgroundImage: AssetImage('assets/images/V.png'),
-            radius: 20,
-          ),
           const SizedBox(width: 10),
-          Text('ArzV', style: Theme.of(context).textTheme.bodyLarge),
+          Text('ArzV', style: TextStyle(fontSize: 30, color: Colors.white)),
           const Spacer(),
           IconButton(
             icon: Icon(
