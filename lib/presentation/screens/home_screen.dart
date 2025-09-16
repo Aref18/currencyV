@@ -18,6 +18,14 @@ class _HomeScreenState extends State<HomeScreen> {
   int? focusedIndex;
   bool isVertical = false;
 
+  late Future<List<Arzcurrency>> _currenciesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _currenciesFuture = ApiService.fetchCurrencies();
+  }
+
   int _getCrossAxisCount(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     if (width < 600) return 2;
@@ -30,12 +38,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return width < 600 ? 1 : 1.5;
   }
 
-  late Future<List<Arzcurrency>> _currenciesFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _currenciesFuture = ApiService.fetchCurrencies();
+  Future<void> _refreshData() async {
+    final currencies = await ApiService.fetchCurrencies();
+    setState(() {
+      focusedIndex = null;
+      arz = currencies;
+      _currenciesFuture = Future.value(currencies);
+    });
   }
 
   @override
@@ -45,27 +54,51 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: const Color.fromARGB(113, 0, 0, 0),
-        actions: [
-          const SizedBox(width: 10),
-          Text(
-            'ArzV',
-            style: const TextStyle(fontSize: 30, color: Colors.white),
-          ),
-          const Spacer(),
-          IconButton(
-            icon: Icon(
-              isVertical ? Icons.list : Icons.grid_view,
-              color: Colors.white,
+        title: Stack(
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      isVertical ? Icons.list : Icons.grid_view,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isVertical = !isVertical;
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 10),
+                ],
+              ),
             ),
-            onPressed: () {
-              setState(() {
-                isVertical = !isVertical;
-              });
-            },
-          ),
-          const SizedBox(width: 10),
-        ],
+            Padding(
+              padding: const EdgeInsets.only(top: 13),
+              child: Center(
+                child: Text(
+                  'calendar - time',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Text(
+                  'ArzV',
+                  style: const TextStyle(fontSize: 30, color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
+
       body: Stack(
         children: [
           SafeArea(
@@ -75,142 +108,146 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const SizedBox(height: 60),
                   Expanded(
-                    child: FutureBuilder<List<Arzcurrency>>(
-                      future: _currenciesFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text(
-                              "خطا در دریافت اطلاعات",
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          );
-                        } else if (snapshot.hasData) {
-                          final currencies = snapshot.data!;
-                          if (arz.isEmpty) {
-                            arz = currencies;
-                            selectedItem = arz.take(4).toList();
-                          }
+                    child: RefreshIndicator(
+                      onRefresh: _refreshData,
+                      color: Colors.green,
+                      backgroundColor: Colors.blueGrey,
+                      child: FutureBuilder<List<Arzcurrency>>(
+                        future: _currenciesFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                "خطا در دریافت اطلاعات",
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                            );
+                          } else if (snapshot.hasData) {
+                            final currencies = snapshot.data!;
+                            if (arz.isEmpty) {
+                              arz = currencies;
+                              selectedItem = arz.take(4).toList();
+                            }
 
-                          return GestureDetector(
-                            onTap: () {
-                              if (focusedIndex != null) {
-                                setState(() {
-                                  focusedIndex = null;
-                                });
-                              }
-                            },
-
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 400),
-                              transitionBuilder: (child, animation) {
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: const Offset(0.1, 0),
-                                      end: Offset.zero,
-                                    ).animate(animation),
-                                    child: child,
-                                  ),
-                                );
+                            return GestureDetector(
+                              onTap: () {
+                                if (focusedIndex != null) {
+                                  setState(() {
+                                    focusedIndex = null;
+                                  });
+                                }
                               },
-                              child:
-                                  isVertical
-                                      ? ListView.builder(
-                                        physics: const BouncingScrollPhysics(),
-                                        itemCount: selectedItem.length,
-                                        itemBuilder: (context, index) {
-                                          return ListItemWidget(
-                                            key: ValueKey(
-                                              selectedItem[index].id,
-                                            ),
-                                            index: index,
-                                            arz: selectedItem,
-                                            isFocused: focusedIndex == index,
-                                            onLongPress: () {
-                                              if (focusedIndex != index) {
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 400),
+                                transitionBuilder: (child, animation) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: SlideTransition(
+                                      position: Tween<Offset>(
+                                        begin: const Offset(0.1, 0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                                child:
+                                    isVertical
+                                        ? ListView.builder(
+                                          physics:
+                                              const AlwaysScrollableScrollPhysics(),
+                                          itemCount: selectedItem.length,
+                                          itemBuilder: (context, index) {
+                                            return ListItemWidget(
+                                              key: ValueKey(
+                                                selectedItem[index].id,
+                                              ),
+                                              index: index,
+                                              arz: selectedItem,
+                                              isFocused: focusedIndex == index,
+                                              onLongPress: () {
+                                                if (focusedIndex != index) {
+                                                  setState(() {
+                                                    focusedIndex = index;
+                                                  });
+                                                }
+                                              },
+                                              onTap: () {
+                                                if (focusedIndex != null) {
+                                                  setState(() {
+                                                    focusedIndex = null;
+                                                  });
+                                                }
+                                              },
+                                              onDelete: () {
+                                                setState(() {
+                                                  selectedItem.removeAt(index);
+                                                  focusedIndex = null;
+                                                });
+                                              },
+                                            );
+                                          },
+                                        )
+                                        : GridView.builder(
+                                          physics:
+                                              const AlwaysScrollableScrollPhysics(),
+                                          clipBehavior: Clip.none,
+                                          itemCount: selectedItem.length,
+                                          itemBuilder: (context, index) {
+                                            return GridItemWidget(
+                                              key: ValueKey(
+                                                selectedItem[index].id,
+                                              ),
+                                              index: index,
+                                              arz: selectedItem,
+                                              isFocused: focusedIndex == index,
+                                              onLongPress: () {
                                                 setState(() {
                                                   focusedIndex = index;
                                                 });
-                                              }
-                                            },
-                                            onTap: () {
-                                              if (focusedIndex != null) {
+                                              },
+                                              onTap: () {
                                                 setState(() {
                                                   focusedIndex = null;
                                                 });
-                                              }
-                                            },
-
-                                            onDelete: () {
-                                              setState(() {
-                                                selectedItem.removeAt(index);
-                                                focusedIndex = null;
-                                              });
-                                            },
-                                          );
-                                        },
-                                      )
-                                      : GridView.builder(
-                                        physics: const BouncingScrollPhysics(),
-                                        clipBehavior: Clip.none,
-                                        itemCount: selectedItem.length,
-                                        itemBuilder: (context, index) {
-                                          return GridItemWidget(
-                                            key: ValueKey(
-                                              selectedItem[index].id,
-                                            ),
-                                            index: index,
-                                            arz: selectedItem,
-                                            isFocused: focusedIndex == index,
-                                            onLongPress: () {
-                                              setState(() {
-                                                focusedIndex = index;
-                                              });
-                                            },
-                                            onTap: () {
-                                              setState(() {
-                                                focusedIndex = null;
-                                              });
-                                            },
-                                            onDelete: () {
-                                              setState(() {
-                                                selectedItem.removeAt(index);
-                                                focusedIndex = null;
-                                              });
-                                            },
-                                          );
-                                        },
-                                        gridDelegate:
-                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisCount:
-                                                  _getCrossAxisCount(context),
-                                              childAspectRatio: _getAspectRatio(
-                                                context,
+                                              },
+                                              onDelete: () {
+                                                setState(() {
+                                                  selectedItem.removeAt(index);
+                                                  focusedIndex = null;
+                                                });
+                                              },
+                                            );
+                                          },
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount:
+                                                    _getCrossAxisCount(context),
+                                                childAspectRatio:
+                                                    _getAspectRatio(context),
+                                                crossAxisSpacing: 12,
+                                                mainAxisSpacing: 12,
                                               ),
-                                              crossAxisSpacing: 12,
-                                              mainAxisSpacing: 12,
-                                            ),
-                                      ),
-                            ),
-                          );
-                        } else {
-                          return const Center(
-                            child: Text(
-                              "هیچ داده‌ای برای نمایش وجود ندارد",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          );
-                        }
-                      },
+                                        ),
+                              ),
+                            );
+                          } else {
+                            return const Center(
+                              child: Text(
+                                "هیچ داده‌ای برای نمایش وجود ندارد",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            );
+                          }
+                        },
+                      ),
                     ),
                   ),
                 ],
