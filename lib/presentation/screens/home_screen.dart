@@ -269,10 +269,15 @@ class _HomeScreenState extends State<HomeScreen> {
               onQueryChanged: (query) {},
               onItemSelected: (item) {
                 setState(() {
-                  if (!selectedItem.contains(item)) {
+                  if (!selectedItem.any((i) => i.id == item.id)) {
                     selectedItem.add(item);
                   }
                 });
+              },
+              isItemSelected: (item) {
+                int index = arz.indexWhere((i) => i.id == item.id);
+                if (index >= 0 && index < 4) return true;
+                return selectedItem.any((i) => i.id == item.id);
               },
             ),
           ),

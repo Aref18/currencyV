@@ -14,6 +14,7 @@ class FloatingSearchBarWidget extends StatefulWidget {
     required this.selectedItem,
     required this.onQueryChanged,
     required this.onItemSelected,
+    required bool Function(dynamic item) isItemSelected,
   });
 
   @override
