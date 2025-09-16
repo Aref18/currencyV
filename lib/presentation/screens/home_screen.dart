@@ -4,6 +4,7 @@ import 'package:currencyv/presentation/widgets/floating_search_bar_widget.dart';
 import 'package:currencyv/presentation/widgets/grid_item_widget.dart';
 import 'package:currencyv/presentation/widgets/list_item_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,11 +20,13 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isVertical = false;
 
   late Future<List<Arzcurrency>> _currenciesFuture;
+  String? _lastUpdated;
 
   @override
   void initState() {
     super.initState();
     _currenciesFuture = ApiService.fetchCurrencies();
+    _lastUpdated = DateFormat('yyyy/MM/dd  HH:mm').format(DateTime.now());
   }
 
   int _getCrossAxisCount(BuildContext context) {
@@ -44,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
       focusedIndex = null;
       arz = currencies;
       _currenciesFuture = Future.value(currencies);
+      _lastUpdated = DateFormat('yyyy/MM/dd  HH:mm').format(DateTime.now());
     });
   }
 
@@ -80,8 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.only(top: 13),
               child: Center(
                 child: Text(
-                  'calendar - time',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
+                  _lastUpdated ?? '',
+                  style: const TextStyle(fontSize: 14, color: Colors.white70),
                 ),
               ),
             ),
