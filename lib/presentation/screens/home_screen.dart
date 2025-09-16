@@ -17,23 +17,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Arzcurrency> selectedItem = [];
   int? focusedIndex;
   bool isVertical = false;
-  bool showResults = false;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchCurrencies();
-  }
-
-  void fetchCurrencies() async {
-    if (arz.isEmpty) {
-      final currencies = await ApiService.fetchCurrencies();
-      setState(() {
-        arz = currencies;
-        selectedItem = arz.take(4).toList();
-      });
-    }
-  }
 
   int _getCrossAxisCount(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -47,6 +30,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return width < 600 ? 1 : 1.5;
   }
 
+  late Future<List<Arzcurrency>> _currenciesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _currenciesFuture = ApiService.fetchCurrencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,8 +47,10 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color.fromARGB(113, 0, 0, 0),
         actions: [
           const SizedBox(width: 10),
-          const SizedBox(width: 10),
-          Text('ArzV', style: TextStyle(fontSize: 30, color: Colors.white)),
+          Text(
+            'ArzV',
+            style: const TextStyle(fontSize: 30, color: Colors.white),
+          ),
           const Spacer(),
           IconButton(
             icon: Icon(
@@ -82,98 +75,142 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const SizedBox(height: 60),
                   Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          focusedIndex = null;
-                        });
-                      },
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 400),
-                        transitionBuilder: (child, animation) {
-                          // می‌تونی نوع انیمیشن رو اینجا عوض کنی
-                          return FadeTransition(
-                            opacity: animation,
-                            child: SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(0.1, 0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
+                    child: FutureBuilder<List<Arzcurrency>>(
+                      future: _currenciesFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
                             ),
                           );
-                        },
-                        child:
-                            isVertical
-                                ? ListView.builder(
-                                  physics: const BouncingScrollPhysics(),
-                                  itemCount: selectedItem.length,
-                                  itemBuilder: (context, index) {
-                                    return ListItemWidget(
-                                      key: ValueKey(selectedItem[index].id),
-                                      index: index,
-                                      arz: selectedItem,
-                                      isFocused: focusedIndex == index,
-                                      onLongPress: () {
-                                        setState(() {
-                                          focusedIndex = index;
-                                        });
-                                      },
-                                      onTap: () {
-                                        setState(() {
-                                          focusedIndex = null;
-                                        });
-                                      },
-                                      onDelete: () {
-                                        setState(() {
-                                          selectedItem.removeAt(index);
-                                          focusedIndex = null;
-                                        });
-                                      },
-                                    );
-                                  },
-                                )
-                                : GridView.builder(
-                                  physics: const BouncingScrollPhysics(),
-                                  clipBehavior: Clip.none,
-                                  itemCount: selectedItem.length,
-                                  itemBuilder: (context, index) {
-                                    return GridItemWidget(
-                                      key: ValueKey(selectedItem[index].id),
-                                      index: index,
-                                      arz: selectedItem,
-                                      isFocused: focusedIndex == index,
-                                      onLongPress: () {
-                                        setState(() {
-                                          focusedIndex = index;
-                                        });
-                                      },
-                                      onTap: () {
-                                        setState(() {
-                                          focusedIndex = null;
-                                        });
-                                      },
-                                      onDelete: () {
-                                        setState(() {
-                                          selectedItem.removeAt(index);
-                                          focusedIndex = null;
-                                        });
-                                      },
-                                    );
-                                  },
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: _getCrossAxisCount(
-                                          context,
-                                        ),
-                                        childAspectRatio: _getAspectRatio(
-                                          context,
-                                        ),
-                                        crossAxisSpacing: 12,
-                                        mainAxisSpacing: 12,
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text(
+                              "خطا در دریافت اطلاعات",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          );
+                        } else if (snapshot.hasData) {
+                          final currencies = snapshot.data!;
+                          if (arz.isEmpty) {
+                            arz = currencies;
+                            selectedItem = arz.take(4).toList();
+                          }
+
+                          return GestureDetector(
+                            onTap: () {
+                              if (focusedIndex != null) {
+                                setState(() {
+                                  focusedIndex = null;
+                                });
+                              }
+                            },
+
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 400),
+                              transitionBuilder: (child, animation) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: SlideTransition(
+                                    position: Tween<Offset>(
+                                      begin: const Offset(0.1, 0),
+                                      end: Offset.zero,
+                                    ).animate(animation),
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              child:
+                                  isVertical
+                                      ? ListView.builder(
+                                        physics: const BouncingScrollPhysics(),
+                                        itemCount: selectedItem.length,
+                                        itemBuilder: (context, index) {
+                                          return ListItemWidget(
+                                            key: ValueKey(
+                                              selectedItem[index].id,
+                                            ),
+                                            index: index,
+                                            arz: selectedItem,
+                                            isFocused: focusedIndex == index,
+                                            onLongPress: () {
+                                              if (focusedIndex != index) {
+                                                setState(() {
+                                                  focusedIndex = index;
+                                                });
+                                              }
+                                            },
+                                            onTap: () {
+                                              if (focusedIndex != null) {
+                                                setState(() {
+                                                  focusedIndex = null;
+                                                });
+                                              }
+                                            },
+
+                                            onDelete: () {
+                                              setState(() {
+                                                selectedItem.removeAt(index);
+                                                focusedIndex = null;
+                                              });
+                                            },
+                                          );
+                                        },
+                                      )
+                                      : GridView.builder(
+                                        physics: const BouncingScrollPhysics(),
+                                        clipBehavior: Clip.none,
+                                        itemCount: selectedItem.length,
+                                        itemBuilder: (context, index) {
+                                          return GridItemWidget(
+                                            key: ValueKey(
+                                              selectedItem[index].id,
+                                            ),
+                                            index: index,
+                                            arz: selectedItem,
+                                            isFocused: focusedIndex == index,
+                                            onLongPress: () {
+                                              setState(() {
+                                                focusedIndex = index;
+                                              });
+                                            },
+                                            onTap: () {
+                                              setState(() {
+                                                focusedIndex = null;
+                                              });
+                                            },
+                                            onDelete: () {
+                                              setState(() {
+                                                selectedItem.removeAt(index);
+                                                focusedIndex = null;
+                                              });
+                                            },
+                                          );
+                                        },
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount:
+                                                  _getCrossAxisCount(context),
+                                              childAspectRatio: _getAspectRatio(
+                                                context,
+                                              ),
+                                              crossAxisSpacing: 12,
+                                              mainAxisSpacing: 12,
+                                            ),
                                       ),
-                                ),
-                      ),
+                            ),
+                          );
+                        } else {
+                          return const Center(
+                            child: Text(
+                              "هیچ داده‌ای برای نمایش وجود ندارد",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          );
+                        }
+                      },
                     ),
                   ),
                 ],
