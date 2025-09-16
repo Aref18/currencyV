@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
       focusedIndex = null;
       arz = currencies;
       _currenciesFuture = Future.value(currencies);
-      _lastUpdated = DateFormat('yyyy/MM/dd  HH:mm').format(DateTime.now());
+      _lastUpdated = DateFormat('yyyy/MM/dd - HH:mm').format(DateTime.now());
     });
   }
 
@@ -85,7 +85,10 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Center(
                 child: Text(
                   _lastUpdated ?? '',
-                  style: const TextStyle(fontSize: 14, color: Colors.white70),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    color: Color.fromARGB(217, 255, 255, 255),
+                  ),
                 ),
               ),
             ),
