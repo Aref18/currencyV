@@ -122,7 +122,7 @@ class ListItemWidget extends StatelessWidget {
                     child: TextButton(
                       onPressed: () {
                         onDelete?.call();
-                        showSnackBar(context, 'آیتم حذف شد');
+                        showSnackBar(context, 'آیتم حذف شد', isAdded: false);
                       },
                       child: const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12),

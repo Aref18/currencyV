@@ -127,7 +127,7 @@ class GridItemWidget extends StatelessWidget {
                     child: Container(
                       height: 36,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFA500), // نارنجی مدرن
+                        color: const Color(0xFFFFA500),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: TextButton(
