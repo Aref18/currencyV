@@ -50,7 +50,7 @@ class GridItemWidget extends StatelessWidget {
               border:
                   isFocused
                       ? Border.all(color: const Color(0xFFFFA500), width: 2)
-                      : null, // نارنجی برای کارت انتخاب شده
+                      : null,
             ),
             child: Stack(
               clipBehavior: Clip.none,
@@ -133,7 +133,7 @@ class GridItemWidget extends StatelessWidget {
                       child: TextButton(
                         onPressed: () {
                           onDelete?.call();
-                          showSnackBar(context, 'آیتم حذف شد');
+                          showSnackBar(context, 'آیتم حذف شد', isAdded: false);
                         },
                         child: const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12),

@@ -1,11 +1,11 @@
 import 'package:currencyv/core/utils/date_utils.dart';
+import 'package:currencyv/core/utils/snackbar_utils.dart';
 import 'package:currencyv/data/model/arz.dart';
 import 'package:currencyv/data/services/api_service.dart';
 import 'package:currencyv/presentation/widgets/floating_search_bar_widget.dart';
 import 'package:currencyv/presentation/widgets/grid_item_widget.dart';
 import 'package:currencyv/presentation/widgets/list_item_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -272,6 +272,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   if (!selectedItem.any((i) => i.id == item.id)) {
                     selectedItem.add(item);
+                    showSnackBar(
+                      context,
+                      '${item.title} اضافه شد',
+                      isAdded: true,
+                    );
                   }
                 });
               },
