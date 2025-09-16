@@ -1,3 +1,4 @@
+import 'package:currencyv/core/utils/date_utils.dart';
 import 'package:currencyv/data/model/arz.dart';
 import 'package:currencyv/data/services/api_service.dart';
 import 'package:currencyv/presentation/widgets/floating_search_bar_widget.dart';
@@ -26,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _currenciesFuture = ApiService.fetchCurrencies();
-    _lastUpdated = DateFormat('yyyy/MM/dd  HH:mm').format(DateTime.now());
+    _lastUpdated = getShamsiDateTime();
   }
 
   int _getCrossAxisCount(BuildContext context) {
@@ -47,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       focusedIndex = null;
       arz = currencies;
       _currenciesFuture = Future.value(currencies);
-      _lastUpdated = DateFormat('yyyy/MM/dd - HH:mm').format(DateTime.now());
+      _lastUpdated = getShamsiDateTime();
     });
   }
 
