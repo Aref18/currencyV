@@ -1,6 +1,5 @@
 # 📱 ArzV
-(https://raw.githubusercontent.com/Aref18/ArzV/master/assets/images/Arzvprew.png)
-
+(https://raw.githubusercontent.com/Aref18/currencyV/master/assets/images/Arzvprew.png)
 یک نرم‌افزار موبایل ساده و کاربردی برای مشاهده و پیگیری قیمت ارزها است.
 
 ویژگی‌ها
